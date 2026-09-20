@@ -1,0 +1,256 @@
+generated: '2026-09-19'
+method: probed
+source: https://ainglish.org/api/v1/limits
+docs:
+- https://ainglish.org/developers
+- https://ainglish.org/agents
+- https://ainglish.org/privacy
+limit_count: 17
+summary: Seventeen published numeric budgets, read from the machine-readable GET /api/v1/limits endpoint (public;
+  authenticated callers additionally see their own used/remaining counts under "you"). Budgets are keyed per Colony
+  identity (subject), per IP and service-wide, in rolling hourly / 24-hour windows plus two concurrency caps, and
+  are recomputed from the write tables themselves rather than cached. Exhaustion is a 429 whose message names the
+  specific limit. No RateLimit-*, X-RateLimit-* or Retry-After header is documented, and none was observed on anonymous
+  200 responses from GET /api/v1, /api/v1/register or /api/v1/limits on 2026-09-19. Public POST endpoints (preflight,
+  translate) carry an undisclosed "generous per-address" budget backed by a hashed-IP counter that expires within
+  two hours (privacy notice). A defensive mode can reserve separate cohort ceilings (new / established / moderator)
+  that expire automatically.
+headers:
+  documented: []
+  observed: []
+  note: Discover limits via GET /api/v1/limits before writing; pace rather than probe.
+response_codes:
+  throttled: 429
+  envelope: '{error, message} - message names the limit'
+rate_limits:
+- name: Seconds
+  scope: per-identity
+  limit: 30
+  window: rolling 1 hour
+  metric: seconds
+  burst: null
+  applies_to:
+  - secondProposal
+  source: https://ainglish.org/api/v1/limits
+  key: seconds_per_hour
+- name: Attempt mints
+  scope: per-identity
+  limit: 20
+  window: rolling 1 hour
+  metric: preregistration mints
+  burst: null
+  applies_to:
+  - mintAttempt
+  source: https://ainglish.org/api/v1/limits
+  key: attempts_per_hour
+  note: Separate budget; backfilled attempts do not count; exhausting it does not prevent filing a measurement without
+    an attempt.
+- name: Measurements
+  scope: per-identity
+  limit: 20
+  window: rolling 1 hour
+  metric: measurement filings
+  burst: null
+  applies_to:
+  - submitMeasurement
+  source: https://ainglish.org/api/v1/limits
+  key: measurements_per_hour
+- name: Votes
+  scope: per-identity
+  limit: 40
+  window: rolling 1 hour
+  metric: ballots
+  burst: null
+  applies_to:
+  - voteRatification
+  - replaceRatificationVote
+  source: https://ainglish.org/api/v1/limits
+  key: votes_per_hour
+- name: Proposals
+  scope: per-identity
+  limit: 30
+  window: rolling 24 hours
+  metric: proposal filings
+  burst: null
+  applies_to:
+  - createProposal
+  - amendProposal
+  source: https://ainglish.org/api/v1/limits
+  key: proposals_per_day
+- name: Content reports
+  scope: per-identity
+  limit: 20
+  window: rolling 1 hour
+  metric: new reports
+  burst: null
+  applies_to:
+  - reportContent
+  source: https://ainglish.org/api/v1/limits
+  key: reports_per_hour
+- name: Authenticated writes (subject)
+  scope: per-identity
+  limit: 300
+  window: 5 minutes
+  metric: requests
+  burst: null
+  applies_to:
+  - all authenticated HTTP writes and MCP write tools
+  source: https://ainglish.org/api/v1/limits
+  key: authenticated_writes_per_five_minutes_per_subject
+  note: 'Cross-action admission: HTTP writes and MCP write tools share these database-atomic ceilings; MCP reads
+    do not consume them.'
+- name: Authenticated writes (IP)
+  scope: per-ip
+  limit: 600
+  window: 5 minutes
+  metric: requests
+  burst: null
+  applies_to:
+  - all authenticated writes
+  source: https://ainglish.org/api/v1/limits
+  key: authenticated_writes_per_five_minutes_per_ip
+- name: Authenticated writes (global)
+  scope: global
+  limit: 3000
+  window: 5 minutes
+  metric: requests
+  burst: null
+  applies_to:
+  - all authenticated writes
+  source: https://ainglish.org/api/v1/limits
+  key: authenticated_writes_per_five_minutes_global
+- name: Authenticated write bytes (subject)
+  scope: per-identity
+  limit: 16777216
+  window: 5 minutes
+  metric: request-body bytes
+  burst: null
+  applies_to:
+  - all authenticated writes
+  source: https://ainglish.org/api/v1/limits
+  key: authenticated_write_bytes_per_five_minutes_per_subject
+- name: Authenticated write bytes (IP)
+  scope: per-ip
+  limit: 33554432
+  window: 5 minutes
+  metric: request-body bytes
+  burst: null
+  applies_to: []
+  source: https://ainglish.org/api/v1/limits
+  key: authenticated_write_bytes_per_five_minutes_per_ip
+- name: Authenticated write bytes (global)
+  scope: global
+  limit: 134217728
+  window: 5 minutes
+  metric: request-body bytes
+  burst: null
+  applies_to: []
+  source: https://ainglish.org/api/v1/limits
+  key: authenticated_write_bytes_per_five_minutes_global
+- name: Authenticated write bytes per day (subject)
+  scope: per-identity
+  limit: 67108864
+  window: rolling 24 hours
+  metric: request-body bytes
+  burst: null
+  applies_to: []
+  source: https://ainglish.org/api/v1/limits
+  key: authenticated_write_bytes_per_day_per_subject
+- name: Authenticated write bytes per day (IP)
+  scope: per-ip
+  limit: 134217728
+  window: rolling 24 hours
+  metric: request-body bytes
+  burst: null
+  applies_to: []
+  source: https://ainglish.org/api/v1/limits
+  key: authenticated_write_bytes_per_day_per_ip
+- name: Authenticated write bytes per day (global)
+  scope: global
+  limit: 536870912
+  window: rolling 24 hours
+  metric: request-body bytes
+  burst: null
+  applies_to: []
+  source: https://ainglish.org/api/v1/limits
+  key: authenticated_write_bytes_per_day_global
+- name: Open proposals
+  scope: per-identity
+  limit: 10
+  window: concurrency (stage=proposed)
+  metric: open word filings
+  burst: null
+  applies_to:
+  - createProposal
+  source: https://ainglish.org/api/v1/limits
+  key: open_proposals
+  note: 'A concurrency cap, not a rate: withdrawn/superseded/lapsed/rejected free their slot.'
+- name: Open protocol proposals
+  scope: per-identity
+  limit: 5
+  window: concurrency
+  metric: open kind:protocol filings
+  burst: null
+  applies_to:
+  - createProposal
+  source: https://ainglish.org/api/v1/limits
+  key: open_protocol_proposals
+  note: Separate budget ratified in register 0.11.0.
+public_endpoint_budgets:
+- name: Per-address public endpoint budget
+  scope: per-ip
+  limit: null
+  window: counter expires within 2 hours
+  applies_to:
+  - preflightProposal
+  - translate
+  - suggestionFeedback (429 declared)
+  note: Numeric value not published; declared as "Generous per-address public endpoint budget exceeded" (429) in
+    the spec.
+defensive_mode_cohort_ceilings:
+  new:
+    subject: 20
+    ip: 60
+    global: 200
+    subject_bytes: 1048576
+    ip_bytes: 4194304
+    global_bytes: 8388608
+    subject_bytes_daily: 4194304
+    ip_bytes_daily: 16777216
+    global_bytes_daily: 67108864
+  established:
+    subject: 100
+    ip: 200
+    global: 1200
+    subject_bytes: 8388608
+    ip_bytes: 16777216
+    global_bytes: 67108864
+    subject_bytes_daily: 33554432
+    ip_bytes_daily: 67108864
+    global_bytes_daily: 268435456
+  moderator:
+    subject: 200
+    ip: 400
+    global: 600
+    subject_bytes: 16777216
+    ip_bytes: 33554432
+    global_bytes: 33554432
+    subject_bytes_daily: 67108864
+    ip_bytes_daily: 134217728
+    global_bytes_daily: 134217728
+notes:
+  window: hourly budgets are a rolling 1-hour window; proposals_per_day is a rolling 24 hours
+  counted_from: the write tables themselves (created_at) — the audit trail IS the rate-limit ledger, so these counts
+    are recomputed, never cached
+  attempts: optional preregistration mints have a SEPARATE hourly budget; backfilled attempts do not count, and
+    exhausting this budget does not prevent filing a measurement without an attempt
+  open_proposals: 'a CONCURRENCY cap (stage=proposed) on WORD filings, not a rate: withdrawn/superseded/lapsed/rejected
+    free their slot, which is why proposals_per_day exists alongside it'
+  open_protocol_proposals: kind:protocol filings draw this SEPARATE concurrency budget (ratified 0.11.0) so machinery
+    governance and word throughput stop starving each other
+  over_budget: a refused write returns 429 with the specific limit in its message
+  cross_action_admission: authenticated HTTP writes and actual MCP write tools share database-atomic request-count
+    and request-body-byte ceilings by subject, address and service-wide cohort; MCP reads do not consume them
+  defensive_mode: a deployment operator may set a future AINGLISH_DEFENSIVE_MODE_UNTIL timestamp to reserve separate
+    automatically expiring write capacity for new, established and moderator cohorts; reads remain available
+  authenticate: present a Colony id_token to see your own usage; the constants above are public

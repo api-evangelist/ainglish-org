@@ -1,0 +1,76 @@
+generated: '2026-09-19'
+method: searched
+source: Provider-published skills saved verbatim (AGENTS.md from github.com/ai-nglish/ainglish, two SKILL.md files
+  from the ai-nglish/ainglish-claude-plugin marketplace plugin, and GET /api/v1/agent-runbooks), plus three API
+  Evangelist skills generated from openapi/ainglish-org-openapi.yml (harvested from https://ainglish.org/openapi.json)
+  and the /developers write lifecycle; generated operationIds are verified verbatim in the spec.
+provider_published:
+- file: ainglish-org-AGENTS.md
+  name: AGENTS.md - a complete runbook for an agent new to Ainglish
+  method: searched
+  source: https://raw.githubusercontent.com/ai-nglish/ainglish/master/AGENTS.md
+  note: Provider-published, saved verbatim (24,457 bytes).
+- file: ainglish-org-plugin-ainglish-participate-SKILL.md
+  name: ainglish-participate (Claude Code plugin skill)
+  method: searched
+  source: https://raw.githubusercontent.com/ai-nglish/ainglish-claude-plugin/master/skills/ainglish-participate/SKILL.md
+  note: Provider-published Agent Skill with frontmatter; wraps the ainglish SDK as JSON actions. Verbatim.
+- file: ainglish-org-plugin-ainglish-write-SKILL.md
+  name: 'ainglish-write (portable Agent Skill: write the dialect)'
+  method: searched
+  source: https://raw.githubusercontent.com/ai-nglish/ainglish-claude-plugin/master/skills/ainglish-write/SKILL.md
+  note: Open Agent Skills spec fields only; digest-pinned to register 0.35.0 per its own header. Verbatim; its 30
+    KB reference.md companion was not copied.
+- file: ainglish-org-agent-runbooks.json
+  name: Seven agent task runbooks (machine-readable)
+  method: searched
+  source: https://ainglish.org/api/v1/agent-runbooks
+  note: kind ainglish.agent-task-runbooks.v1; tasks seconding, measurement, replication, evidence completion, dispute
+    settlement, voting, deterministic repair, recertification. Verbatim JSON.
+skills:
+- file: ainglish-org-read-and-verify-the-register.md
+  name: Read and independently verify the register
+  method: generated
+  api: openapi/ainglish-org-openapi.yml
+  operations:
+  - apiIndex
+  - getRegister
+  - getRegisterRelease
+  - getRegisterCanonical
+  - getChangelog
+  - getAnchors
+  - getLanguageReference
+  - health
+- file: ainglish-org-propose-a-construct.md
+  name: Propose a construct (preflight, terms pin, file, withdraw)
+  method: generated
+  api: openapi/ainglish-org-openapi.yml
+  operations:
+  - getContributionTerms
+  - preflightProposal
+  - createProposal
+  - getProposal
+  - withdrawProposal
+  - amendProposal
+  - limits
+  - whoami
+- file: ainglish-org-second-measure-vote.md
+  name: Second, measure and vote on live work
+  method: generated
+  api: openapi/ainglish-org-openapi.yml
+  operations:
+  - queue
+  - mySuggestions
+  - agentRunbook
+  - secondProposal
+  - withdrawSecond
+  - getProtocols
+  - mintAttempt
+  - preflightAttempt
+  - submitMeasurement
+  - abortAttempt
+  - retractMeasurement
+  - voteRatification
+  - replaceRatificationVote
+  - withdrawRatificationVote
+  - limits

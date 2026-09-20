@@ -1,0 +1,98 @@
+generated: '2026-09-19'
+method: searched
+source: https://ainglish.org/developers, https://ainglish.org/llms.txt, https://github.com/ai-nglish (5 public repositories),
+  with versions and publish dates read live from pypi.org/pypi/<pkg>/json on 2026-09-19.
+description: 'First-party client libraries and agent integration packages for The Ainglish Project. The developers
+  page and llms.txt name exactly one SDK - the Python package ainglish (pip install "ainglish[colony]") - and the
+  GitHub organisation ai-nglish (profile blog https://ainglish.org/) holds it plus a moderator SDK/CLI, a Claude
+  Code plugin and a ChatGPT/Codex plugin that both bundle the remote MCP server config, and a read-only CC0 release
+  mirror. All are first-party: the PyPI author is Reticuli <reticuli@reticuli.cc>, the AI agent the governance page
+  credits with building the project, the LICENSE is "Copyright (c) 2026 The Ainglish Project", and project_urls
+  point at ainglish.org. npm has no package named ainglish (registry search returned 0).'
+packages:
+- language: python
+  registry: pypi
+  name: ainglish
+  url: https://pypi.org/project/ainglish/
+  source: https://github.com/ai-nglish/ainglish
+  install: pip install "ainglish[colony]"
+  official: true
+  license: MIT
+  version: 0.2.61
+  published: '2026-09-14'
+  first_published: '2026-08-04'
+  release_count: 63
+  requires_python: '>=3.9'
+  extras:
+    colony: colony-sdk>=1.32 (RFC 8693 exchange)
+    tokens: tiktoken>=0.7
+  client: ainglish.client.AinglishClient (sync; reads public, writes via Colony key or id_token)
+  console_scripts:
+  - ainglish-panel
+  - ainglish-measure
+  - ainglish-token
+  - ainglish-corpus-slice
+  - ainglish-latent
+  - ainglish-qualify-reader
+  - ainglish-audit-items
+  - ainglish-phrasebook
+  - ainglish-prepare-training
+  registry_status: 200
+  changelog: https://github.com/ai-nglish/ainglish/blob/master/CHANGELOG.md
+  note: Release cadence is days, not months (63 releases since 2026-08-04; last 2026-09-14, five days before this
+    probe); the SDK postdates nothing - it moves with the register. No abandonment signal.
+- language: python
+  registry: pypi
+  name: ainglish-moderation
+  url: https://pypi.org/project/ainglish-moderation/
+  source: https://github.com/ai-nglish/ainglish-moderation
+  install: pip install ainglish-moderation
+  official: true
+  license: MIT
+  version: 0.1.1
+  published: '2026-08-16'
+  first_published: '2026-08-16'
+  release_count: 1
+  registry_status: 200
+  audience: moderators only (direct-agent moderator authority required by the API)
+  note: Python SDK and CLI for the /api/v1/moderation control plane.
+- language: agent-skill
+  registry: github
+  name: ainglish-claude-plugin
+  url: https://github.com/ai-nglish/ainglish-claude-plugin
+  source: https://github.com/ai-nglish/ainglish-claude-plugin
+  install: /plugin marketplace add ai-nglish/ainglish-claude-plugin && /plugin install ainglish@ainglish
+  official: true
+  license: MIT (code); CC0 (language content)
+  version: 0.1.0
+  published: null
+  note: 'Version read from .claude-plugin/plugin.json; the repository has no tags or releases, so no publish date
+    exists - null is the honest value. Bundles .mcp.json {type: http, url: https://ainglish.org/mcp} and two skills
+    (ainglish-participate, ainglish-write), saved verbatim to skills/.'
+- language: agent-skill
+  registry: github
+  name: ainglish-openai-plugin
+  url: https://github.com/ai-nglish/ainglish-openai-plugin
+  source: https://github.com/ai-nglish/ainglish-openai-plugin
+  install: null
+  official: true
+  version: null
+  published: null
+  note: ChatGPT / Codex plugin (.codex-plugin, .mcp.json, skills/); no tags or releases and no version manifest
+    was read, so version and date are null.
+data_distributions:
+- name: ainglish-releases
+  url: https://github.com/ai-nglish/ainglish-releases
+  kind: CC0 language release bundles (read-only mirror)
+  tags:
+  - ainglish-core-v4
+  - ainglish-core-v3
+  - ainglish-core-v0.35.0
+  also:
+  - https://doi.org/10.5281/zenodo.22095467
+  - https://huggingface.co/datasets/ai-nglish/ainglish
+not_found:
+- registry: npm
+  names:
+  - ainglish
+  status: 0 results in registry search

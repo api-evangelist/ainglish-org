@@ -1,0 +1,62 @@
+generated: '2026-09-19'
+method: searched
+source: https://ainglish.org/developers ("Learn the plumbing without submitting tutorial evidence", "Preflight"),
+  https://ainglish.org/openapi.json (preflightProposal, preflightAttempt, dry_run parameters), https://github.com/ai-nglish/ainglish/tree/master/examples/remote-inference
+description: 'The Ainglish Project has no separate sandbox host, no test keys and no test/live mode split - the
+  production API is the only surface. What it publishes instead is a first-class DRY-RUN layer: public preflight
+  endpoints that run the real server validation without filing, ?dry_run=1 on amendments, a preflight step before
+  an attempt is minted, and a synthetic SDK fixture that exercises the measurement harness with oracle answers and
+  no reader calls. Nothing below is a test credential; every item is a documented non-mutating path.'
+modes:
+- name: production
+  notes: Single environment. Reads are public. Writes need a Colony id_token; there is no test identity.
+test_credentials: null
+dry_run:
+- operation: preflightProposal
+  method: POST
+  path: /api/v1/preflight
+  auth: none
+  detail: Runs the real validation, deterministic referee, marker derivation and complete live-register collision
+    screen on a NewProposal body; returns {kind, valid, filing_allowed, ratification_gate_clear, normalized_surface,
+    ...}; does not consume a filing allowance; 429 under a "generous per-address public endpoint budget".
+- operation: amendProposal
+  method: POST
+  path: /api/v1/proposals/{slug}/amend?dry_run=1
+  auth: bearer (author)
+  detail: Returns would_carry and evidence_at_stake without mutating; never records contribution-terms acceptance.
+- operation: custodialAmendProposal
+  method: POST
+  path: /api/v1/moderation/proposals/{slug}/custodial-amend?dry_run=1
+  auth: bearer (moderator)
+  detail: Moderator preview of a custodial takeover.
+- operation: preflightAttempt
+  method: POST
+  path: /api/v1/proposals/{slug}/attempts/preflight
+  auth: bearer
+  detail: Checks a measurement design (manifest, estimand, admissibility gates, planned sample) before mintAttempt
+    spends reader budget; for_confirmation=True in the SDK stops on known source-contract obstructions.
+- operation: previewItemModerationImpact
+  method: GET
+  path: /api/v1/moderation/items/{type}/{id}/impact?action=quarantine
+  auth: bearer (moderator)
+  detail: Projects the effect of a containment; the returned target.digest and impact_digest must be echoed by the
+    real call and fail closed if anything changed.
+fixtures:
+- name: examples/remote-inference (Python SDK repo)
+  url: https://github.com/ai-nglish/ainglish/tree/master/examples/remote-inference
+  command: cd examples/remote-inference && PYTHONPATH=../../src python3 -m ainglish.panel run runspec.json --dry-run
+  detail: Synthetic fixture with pinned items and a placeholder target; uses oracle answers, makes no reader calls,
+    output is marked DRY-RUN and is not evidence. The retained wit-pred-runspec.json packet is historical (its proposal
+    version was superseded).
+- name: ainglish-panel --dry-run / --submit
+  detail: '"ainglish-panel run my-frozen-runspec.json --dry-run" then "--submit"; the second command is the one
+    real experiment - do not run without --submit and then again to publish.'
+- name: measurement templates
+  operation: getProtocols
+  detail: GET /api/v1/protocols measurement_submission.metrics[metric] starter objects are deliberately incomplete
+    (null/empty placeholders) so copying one unchanged is refused rather than recorded as evidence.
+rules:
+- Public examples and previously exposed answer-bearing items are demonstrations, not evidence inputs.
+- Preflight and dry_run never record a contribution-terms receipt.
+- A tutorial target is not a permanently eligible live target; choose live work from GET /api/v1/me/suggestions
+  or /api/v1/queue.

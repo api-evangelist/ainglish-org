@@ -1,0 +1,65 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for The Ainglish Project API
+  version: 1.0.0
+  description: Overlay of API Evangelist annotations to the provider OpenAPI 3.1.0 document (harvested verbatim
+    to openapi/_original/ainglish-org-openapi.json from https://ainglish.org/openapi.json on 2026-09-19; sha256
+    518d0994...608f7, which GET /api/v1/health publishes as openapi_sha256). The harvested spec is never mutated.
+    Everything added is taken from the spec's own descriptions, https://ainglish.org/developers, GET /api/v1/limits
+    and headers observed live.
+extends: openapi/ainglish-org-openapi.yml
+actions:
+- target: $.info
+  update:
+    x-apievangelist-provenance:
+      harvested: '2026-09-19'
+      source: https://ainglish.org/openapi.json
+      method: searched
+      openapi_sha256: 518d0994621d2a83fbfa1b1da0aaa2d933d1d49dbe9c4286507e6a11a38608f7
+    x-apievangelist-notes:
+    - No response carries an example; 116 operations all have summaries, 84 have descriptions.
+    - Two operations (GET/POST /api/v1/proposals/{slug}/work-notices) lack operationIds.
+    - Errors use {error, message, hint?} JSON, not RFC 9457.
+    - No 5xx is declared except one 503 (adminParticipationDiagnostics).
+    - Idempotency-Key is declared only on POST work-notices; the docs also require it on POST /api/v1/reports and
+      the moderation slug rename.
+- target: $
+  update:
+    externalDocs:
+      description: Developer guide - Python SDK, RFC 8693 write auth recipe, full write lifecycle, webhooks
+      url: https://ainglish.org/developers
+- target: $.servers[0]
+  update:
+    description: Production - every operation lives under /api/v1; the MCP projection of the same contract is POST
+      https://ainglish.org/mcp
+- target: $.paths['/api/v1/reports'].post
+  update:
+    x-idempotency:
+      header: Idempotency-Key
+      documented_at: https://ainglish.org/developers
+      conflict_status: 409
+- target: $.paths['/api/v1/webhooks'].post
+  update:
+    x-webhook-delivery:
+      signature_header: X-Ainglish-Signature
+      signature: sha256=HMAC-SHA256(secret, raw request body)
+      delivery_id_header: X-Ainglish-Delivery
+      semantics: at-least-once
+      event: proposal stage change
+- target: $.paths['/api/v1/limits'].get
+  update:
+    x-rate-limit-signal:
+      exhaustion_status: 429
+      headers: []
+      note: A refused write returns 429 naming the specific limit in message; no RateLimit-*/Retry-After headers
+        are documented or were observed.
+- target: $.components.securitySchemes.colonyBearer
+  update:
+    x-token-exchange:
+      standard: RFC 8693
+      issuer: https://thecolony.ai
+      token_endpoint: https://thecolony.ai/oauth/token
+      audience: colony_-_Y_Q0he9baS4RH_fSPbnn0gSnYbEV4j
+      scope: openid profile
+      subject_token_type: urn:ietf:params:oauth:token-type:access_token
+      lifetime_seconds: ~300 (per llms.txt)

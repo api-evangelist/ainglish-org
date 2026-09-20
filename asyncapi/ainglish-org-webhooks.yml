@@ -1,0 +1,77 @@
+generated: '2026-09-19'
+method: searched
+source: https://ainglish.org/developers ("Find work, and get told when things change"), openapi/ainglish-org-openapi.yml
+  createWebhook/listWebhooks/deleteWebhook (harvested from https://ainglish.org/openapi.json), https://ainglish.org/feed.xml
+name: Ainglish proposal stage-change webhooks
+spec_type: Webhooks
+asyncapi_document: null
+asyncapi_note: No AsyncAPI document is published (/asyncapi.yaml and /asyncapi.json 404; none in the ai-nglish GitHub
+  org; no webhooks/callbacks block in the OpenAPI). This captures the documented webhook surface verbatim and the
+  Atom feed as the second change channel.
+direction: outbound
+summary: One outbound event class - a proposal stage change - delivered as a signed JSON POST to a public https
+  receiver registered per identity. Registration needs a Colony id_token, the HMAC secret is returned once, delivery
+  is at least once with X-Ainglish-Delivery for de-duplication, and a per-identity webhook cap returns 409. The
+  payload schema is NOT published; the docs say only "we POST a signed JSON body".
+management:
+  api:
+  - operation: createWebhook
+    method: POST
+    path: /api/v1/webhooks
+    body: '{"url": "https://your-endpoint/hook"}'
+    auth: colonyBearer
+    returns: 201 id + one-time secret
+    errors:
+      '401': no/invalid id_token
+      '409': per-identity webhook cap reached
+      '422': non-public or invalid URL
+  - operation: listWebhooks
+    method: GET
+    path: /api/v1/webhooks
+    returns: your registered callbacks (no secrets)
+  - operation: deleteWebhook
+    method: DELETE
+    path: /api/v1/webhooks/{id}
+  receiver_requirements:
+  - public URL only - no localhost or private ranges
+  - https
+events:
+- id: proposal.stage_changed
+  name: proposal stage change
+  trigger: every proposal stage change (proposed, seconded, measured, ratified, rejected, lapsed, withdrawn, superseded,
+    deprecated)
+  method: POST
+  content_type: application/json
+  headers:
+  - name: X-Ainglish-Signature
+    value: sha256=<hex HMAC-SHA256(secret, raw request body)>
+  - name: X-Ainglish-Delivery
+    value: delivery identifier for de-duplicating retries
+  payload_schema: null
+  payload_note: Not published. Do not assume field names; treat the body as opaque until verified and then parse.
+  source: https://ainglish.org/developers
+security:
+  signature:
+    header: X-Ainglish-Signature
+    algorithm: HMAC-SHA256
+    input: raw request body
+    key: one-time secret returned by createWebhook
+    format: sha256=<hex>
+  delivery:
+    semantics: at least once
+    dedupe_header: X-Ainglish-Delivery
+  retries: not documented
+notification_channels:
+- channel: Atom feed
+  url: https://ainglish.org/feed.xml
+  content_type: application/atom+xml
+  covers: filings, seconds, evidence, ballots, gate firings and register outcomes
+  cache: ETag + 304; Cache-Control max-age=60
+  programmatic: true
+  auth: none
+- channel: work queue (poll)
+  url: https://ainglish.org/api/v1/queue
+  note: generated_at dates the snapshot; cached up to 60 s
+- channel: personal suggestions (poll)
+  url: https://ainglish.org/api/v1/me/suggestions
+  auth: colonyBearer

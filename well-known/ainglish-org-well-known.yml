@@ -1,0 +1,156 @@
+generated: '2026-09-19'
+method: searched
+description: 'Results of probing the /.well-known/ discovery surface on every host the record knows: the registrable
+  domain ainglish.org - which is also the only API baseURL host, the only OpenAPI servers[] host, the docs host
+  (/developers) AND the MCP server host (https://ainglish.org/mcp, so RFC 9728 protected-resource metadata would
+  live here and does not) - its www alias (serves identical bodies), and thecolony.ai, the third-party OpenID provider
+  / authorization server that the agent card''s securitySchemes.colony.openIdConnectUrl names and whose RFC 8693
+  token-exchange id_tokens the API accepts. Status is the HTTP code observed on 2026-09-19 with a browser User-Agent;
+  only 2xx responses carrying a real, correctly-typed document were saved (file: populated). ainglish.org answers
+  misses with a real HTML 404 (993 bytes), so there is no catch-all ambiguity; the negative control returned 404
+  on ainglish.org and www.ainglish.org. api., docs. and mcp. subdomains do not resolve (NXDOMAIN).'
+path_echo_control: passed
+hit_count: 3
+hit_count_note: Three real documents on the provider host (ai-plugin.json, agent.json, mcp.json), duplicated on
+  www; plus two authorization-server documents on the third-party host thecolony.ai. No security.txt, no OAuth/OIDC
+  metadata, no api-catalog, no apis.json on ainglish.org.
+hosts:
+- host: https://ainglish.org
+  role: primary domain, API base host, OpenAPI servers[] host, docs host, MCP server host
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    type: application/json
+    file: ainglish-org-ai-plugin.json
+    note: OpenAI plugin manifest schema v1; api.url https://ainglish.org/openapi.json (the real 116-operation OpenAPI
+      3.1), auth none, contact_email privacy@starsol.co.uk, legal_info_url /contribution-terms; description names
+      the MCP endpoint and llms.txt.
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /security.txt
+    status: 404
+  - path: /llms-full.txt
+    status: 404
+  - path: /.well-known/agent.json
+    status: 200
+    type: application/json
+    file: ../a2a/ainglish-org-agent-card.json
+    note: A2A AgentCard at the legacy path; graded flavored in a2a/ainglish-org-a2a.yml (verbatim body at a2a/ainglish-org-agent-card.json).
+  - path: /.well-known/mcp.json
+    status: 200
+    type: application/json
+    file: ainglish-org-mcp.json
+    note: 'MCP descriptor: endpoint https://ainglish.org/mcp, transport streamable-http, protocolVersion 2025-06-18,
+      13-item tools_summary (the live tools/list returns 51). See mcp/ainglish-org-mcp.yml.'
+  - path: /llms.txt
+    status: 200
+    type: text/plain
+    file: ../llms/ainglish-org-llms.txt
+    note: llms.txt at the site root, 14,458 bytes, saved verbatim.
+  - path: /openapi.json
+    status: 200
+    type: application/json
+    file: ../openapi/_original/ainglish-org-openapi.json
+    note: OpenAPI 3.1.0, 109 paths / 116 operations; sha256 matches the openapi_sha256 GET /api/v1/health publishes.
+  - path: /.well-known/ainglish-org-negative-control-df35e328.json
+    status: 404
+    control: negative
+- host: https://www.ainglish.org
+  role: www alias (serves the same bodies as the apex; no redirect)
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    type: application/json
+    file: ainglish-org-ai-plugin.json
+    note: OpenAI plugin manifest schema v1; api.url https://ainglish.org/openapi.json (the real 116-operation OpenAPI
+      3.1), auth none, contact_email privacy@starsol.co.uk, legal_info_url /contribution-terms; description names
+      the MCP endpoint and llms.txt.
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /security.txt
+    status: 404
+  - path: /llms-full.txt
+    status: 404
+  - path: /.well-known/agent.json
+    status: 200
+    type: application/json
+    file: ../a2a/ainglish-org-agent-card.json
+    note: A2A AgentCard at the legacy path; graded flavored in a2a/ainglish-org-a2a.yml (verbatim body at a2a/ainglish-org-agent-card.json).
+  - path: /.well-known/mcp.json
+    status: 200
+    type: application/json
+    file: ainglish-org-mcp.json
+    note: 'MCP descriptor: endpoint https://ainglish.org/mcp, transport streamable-http, protocolVersion 2025-06-18,
+      13-item tools_summary (the live tools/list returns 51). See mcp/ainglish-org-mcp.yml.'
+  - path: /.well-known/ainglish-org-negative-control-df35e328.json
+    status: 404
+    control: negative
+- host: https://thecolony.ai
+  role: third-party OpenID provider and OAuth 2.0 authorization server named by the agent card (securitySchemes.colony.openIdConnectUrl)
+    and the developer docs; the RFC 8693 token exchange that mints an Ainglish-audienced id_token happens here.
+    Documents recorded are The Colony's authorization-server metadata only - its own agent card, security.txt and
+    protected-resource document describe The Colony, not Ainglish, and are deliberately not indexed here.
+  documents:
+  - path: /.well-known/openid-configuration
+    status: 200
+    type: application/json
+    file: ainglish-org-thecolony-openid-configuration.json
+    note: issuer https://thecolony.ai; token_endpoint https://thecolony.ai/oauth/token; grant_types_supported include
+      urn:ietf:params:oauth:grant-type:token-exchange; registration_endpoint https://thecolony.ai/oauth/register;
+      scopes_supported include openid, profile.
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    type: application/json
+    file: ainglish-org-thecolony-oauth-authorization-server.json
+    note: RFC 8414 metadata for the same issuer (55 keys).
+  - path: /.well-known/ainglish-org-negative-control-df35e328.json
+    status: 404
+    control: negative

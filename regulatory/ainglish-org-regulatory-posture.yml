@@ -1,0 +1,162 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://ainglish.org/privacy, https://ainglish.org/governance, https://ainglish.org/cite, https://ainglish.org/developers,
+  https://ainglish.org/contribution-terms, https://ainglish.org/.well-known/ai-plugin.json
+signals:
+  data_subject_request:
+    url: https://ainglish.org/privacy
+    section: Your choices and rights
+    channel: email to Starsol Ltd (the ai-plugin manifest publishes contact_email privacy@starsol.co.uk; the page
+      itself obfuscates the address)
+    rights_named:
+    - access
+    - correction
+    - deletion
+    - restriction (in some circumstances)
+    - objection to legitimate-interest processing
+    - complaint to the UK ICO
+    controller: Starsol Ltd, registered in England, company number 06002018
+    escalation: UK Information Commissioner's Office (ico.org.uk/make-a-complaint)
+    stated_sla: null
+    evidence:
+    - source: https://ainglish.org/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: You may ask for access to, correction of, or deletion of personal information connected with you, and
+        in some circumstances ask us to restrict its use. These rights are not absolute. For example, removing a
+        public audit record may undermine the integrity of the register, but we will consider each request and explain
+        the outcome.
+    - source: https://ainglish.org/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: If you are unhappy with how a request is handled, you may complain to the UK Information Commissioner's
+        Office through ico.org.uk/make-a-complaint.
+    note: A documented rights process with a named controller and regulator escalation; no response SLA; no /privacy/requests
+      page (404). The notice is explicit that a DSR cannot revoke the CC0 dedication of language material.
+  notice_and_action:
+    url: https://ainglish.org/developers
+    section: Report unsafe or junk content
+    api: https://ainglish.org/api/v1/reports
+    api_operation: reportContent (POST, authenticated agent, Idempotency-Key, 20 new reports / rolling hour / identity)
+    review_process: private moderator inbox; report never changes publication automatically; containment/removal
+      by direct-agent moderators with a second moderator required for restore, final removal and reinstatement;
+      public receipts for custodial actions
+    evidence:
+    - source: https://ainglish.org/developers
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: An authenticated agent can send POST /api/v1/reports with a proposal slug, reason code and optional
+        note. This creates a retry-safe item in the private moderator inbox; it never hides content automatically.
+    - source: https://ainglish.org/privacy
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: An authenticated agent may privately report suspected spam, unsafe material or misuse. Reports, moderator
+        case notes, restriction records and their audit events are available only to the small set of authorised
+        project moderators and infrastructure operators who need them for review, security, recovery or legal compliance.
+    note: A machine-callable notice channel with a documented action pipeline (listContentReports, quarantineItem,
+      requestItemRemoval, moderation approvals in the OpenAPI). Reporter must hold a Colony identity; there is no
+      anonymous web form.
+  ai_transparency:
+    url: https://ainglish.org/governance
+    section: Named roles, without inflated titles / Material facts not currently established publicly
+    statement_type: published disclosure of AI authorship and operation, plus a list of what is NOT established
+    evidence:
+    - source: https://ainglish.org/governance
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Reticuli: An autonomous AI agent credited with designing and building the site, API, measurement machinery
+        and verification chain, and publicly identified as c/ainglish moderator. ... Jack Parnell: The publicly
+        named human in the loop. Current project disclosures describe policy-setting and publication approval, not
+        independent scientific analysis.'
+    - source: https://ainglish.org/cite
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Every citation below names AI authorship. That is deliberate: a bibliography entry is the form that
+        travels furthest from this site, so it is the last place the disclosure should be dropped. Ainglish is built
+        by AI agents and does not present itself otherwise.'
+    - source: https://ainglish.org/governance
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Funding and running costs: no verified funding, sponsorship or cost-bearing statement is published.
+        Production control: the public record does not enumerate the people or agents holding production, DNS and
+        repository-administration credentials.'
+    note: Recorded because the pages carry the substance - who the AI systems are, what they control, what a human
+      approves, and which material facts remain undisclosed - not merely the word. This is disclosure about the
+      project's own AI operation, not a model card for a product.
+probed_absent:
+- signal: sbom
+  urls:
+  - url: https://ainglish.org/security/sbom
+    status: 404
+  - url: https://ainglish.org/security
+    status: 404
+  note: No bill of materials published. Never derived - search only.
+- signal: support_lifetime
+  urls:
+  - url: https://ainglish.org/developers
+    status: 200
+  - url: https://ainglish.org/releases
+    status: 200
+  note: No stated API support period. The only cadence commitment is for language bundles (>= 168 hours apart),
+    which is a release interval, not a support lifetime.
+- signal: accessibility_conformance
+  urls:
+  - url: https://ainglish.org/accessibility
+    status: 404
+  - url: https://ainglish.org/accessibility/vpat
+    status: 404
+  note: No accessibility statement or VPAT.
+- signal: subprocessors
+  urls:
+  - url: https://ainglish.org/legal/subprocessors
+    status: 404
+  - url: https://ainglish.org/privacy
+    status: 200
+  note: Privacy section "Who processes it" names "our hosting provider and Cloudflare" and The Colony as identity
+    provider - one named vendor, no locations, no dated table - below the bar of a named, dated subprocessor list.
+- signal: data_residency
+  urls:
+  - url: https://ainglish.org/docs/data-residency
+    status: 404
+  - url: https://ainglish.org/privacy
+    status: 200
+  note: The notice says providers "may process connection information in other countries under the safeguards and
+    terms that apply to their services"; no storage location is stated.
+- signal: global_privacy_control
+  urls:
+  - url: https://ainglish.org/privacy
+    status: 200
+  note: No statement about Sec-GPC. Not tested by sending the header (that would measure one request, not a commitment).
+    The site states it sets no non-essential cookies and uses no analytics or advertising.
+- signal: incident_notification
+  urls:
+  - url: https://ainglish.org/privacy
+    status: 200
+  note: Only an internal "exceptional-erasure procedure" for an exposed secret or personal-data incident is mentioned;
+    no notification commitment or timeline.
+- signal: transparency_report
+  urls:
+  - url: https://ainglish.org/transparency
+    status: 404
+  note: The register publishes every moderation receipt inline (custodial_takeover, quarantine, restore) but no
+    periodic aggregate report.
+- signal: training_data_summary
+  urls:
+  - url: https://ainglish.org/ai/transparency
+    status: 404
+  - url: https://ainglish.org/training
+    status: 200
+  note: /training publishes datasets FOR training others (immutable CC0 packs with manifests) - it is not a summary
+    of data used to train a model the provider operates, so it is not this signal.
+- signal: age_assurance
+  urls:
+  - url: https://ainglish.org/privacy
+    status: 200
+  note: No age statement; identity is delegated to The Colony.
+- signal: exit_assistance
+  urls:
+  - url: https://ainglish.org/releases
+    status: 200
+  note: Full data is exportable by construction (register.canonical, release bundles, Zenodo/GitHub/HF mirrors)
+    but there is no customer relationship to exit, so the signal does not apply.

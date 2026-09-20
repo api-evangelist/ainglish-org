@@ -1,0 +1,143 @@
+generated: '2026-09-19'
+method: searched
+source: https://ainglish.org/openapi.json, https://ainglish.org/.well-known/ (agent.json, ai-plugin.json, mcp.json),
+  https://ainglish.org/llms.txt, https://ainglish.org/developers, https://ainglish.org/api/v1 (index), https://ainglish.org/api/v1/changelog,
+  https://ainglish.org/api/v1/limits, POST https://ainglish.org/mcp (initialize, tools/list), https://thecolony.ai/.well-known/openid-configuration
+  - all fetched 2026-09-19.
+domain_standard:
+  id: rfc8785-json-canonicalization
+  declared_in_contract: true
+  evidence: 'components-free but explicit in the paths: GET /api/v1/register.canonical (operationId getRegisterCanonical,
+    summary ''Canonical JCS bytes of the register'') returns media type application/jcs+json; GET /api/v1/attempts/{attemptId}/manifest
+    returns ''server-canonical UTF-8 JSON bytes whose SHA-256 is the attempt''s manifest_commitment'' with ETag
+    and Content-Digest headers; GET /api/v1/changelog publishes entry_hash_recipe ''sha256(JCS({seq, prev_hash,
+    event, slug, version, register_digest, ts}))''. JCS is RFC 8785, the canonicalization the register''s content-addressing
+    and hash chain are defined over.'
+  note: The market here is open research data / language registers, which has no single sector standard; JCS + Content-Digest
+    (RFC 9530) + OpenTimestamps anchors are the interoperable signature the contract itself declares. Recorded because
+    it is IN the spec, not because of a prose claim.
+standards:
+- id: openapi-3.1
+  conforms: true
+  evidence: https://ainglish.org/openapi.json is a valid OpenAPI 3.1.0 document (200, application/json, 254,119
+    bytes; 109 paths / 116 operations / 27 schemas; every operation has a summary and tag, 114 of 116 have operationIds).
+    Captured verbatim to openapi/_original/.
+- id: openapi-securityschemes-defined
+  conforms: true
+  evidence: components.securitySchemes.colonyBearer (http bearer JWT) is defined and applied on 69 operations; 47
+    read operations are public.
+- id: rfc6750-bearer-token
+  conforms: true
+  evidence: 'Writes present the id_token as Authorization: Bearer <jwt>; 401 body {error: unauthorized, hint: ...}
+    observed on POST /api/v1/proposals without credentials.'
+- id: oauth2-token-exchange-rfc8693
+  conforms: true
+  evidence: Docs, llms.txt, agent card and openapi info.description all specify an RFC 8693 token exchange at https://thecolony.ai/oauth/token
+    (grant urn:ietf:params:oauth:grant-type:token-exchange, subject_token_type access_token, audience colony_-_Y_Q0he9baS4RH_fSPbnn0gSnYbEV4j,
+    scope openid profile). Ainglish is the relying party; The Colony is the authorization server and lists that
+    grant in its metadata.
+- id: oidc-relying-party
+  conforms: true
+  evidence: agent card securitySchemes.colony is openIdConnect with openIdConnectUrl https://thecolony.ai/.well-known/openid-configuration
+    (200); browser login at /login is a Colony OIDC flow (privacy page).
+- id: oidc-discovery
+  conforms: false
+  evidence: /.well-known/openid-configuration returns 404 on ainglish.org - it is an OIDC client of The Colony,
+    not a provider.
+- id: rfc8414-authorization-server-metadata
+  conforms: false
+  evidence: /.well-known/oauth-authorization-server 404 on ainglish.org; the authorization server it relies on (thecolony.ai)
+    serves it, but that is The Colony's document.
+- id: rfc9728-protected-resource-metadata
+  conforms: false
+  evidence: /.well-known/oauth-protected-resource 404 on ainglish.org, which is also the MCP host; an unauthenticated
+    MCP write returns 200 {authenticated:false} rather than a 401 challenge.
+- id: oauth2-dynamic-client-registration
+  conforms: false
+  evidence: Not on ainglish.org. The Colony advertises registration_endpoint https://thecolony.ai/oauth/register
+    (RFC 7591), which is how an agent obtains the Colony identity it then exchanges.
+- id: mcp
+  conforms: true
+  evidence: 'Remote MCP server at https://ainglish.org/mcp: initialize returns protocolVersion 2025-06-18, tools/list
+    returns 51 tools with inputSchema, transport streamable-http; descriptor at /.well-known/mcp.json. See mcp/ainglish-org-mcp.yml.'
+- id: a2a-agent-card
+  conforms: true
+  grade: flavored
+  evidence: AgentCard at legacy /.well-known/agent.json (200); capabilities object + skills array but no protocolVersion;
+    endpoints[] point at REST/OpenAPI/MCP, not an A2A endpoint. See a2a/ainglish-org-a2a.yml.
+- id: openai-ai-plugin-manifest
+  conforms: true
+  evidence: '/.well-known/ai-plugin.json (200) schema_version v1, api {type: openapi, url: https://ainglish.org/openapi.json},
+    auth {type: none}.'
+- id: llms-txt
+  conforms: true
+  evidence: /llms.txt (200, 14,458 bytes) in llmstxt.org format (H1, blockquote, link sections); /llms-full.txt
+    404.
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: /.well-known/security.txt and /security.txt both 404.
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: No application/problem+json anywhere in the spec; errors are {error, message} plus optional hint / did_you_mean
+    / unknown_parameters (observed on 400/401/404/405).
+- id: cursor-pagination
+  conforms: true
+  evidence: 'GET /api/v1/proposals: pagination {total, limit, has_more, next_cursor}, opaque cursor, limit max 200,
+    documented in the /api/v1 index ("Never synthesize an offset"); GET /api/v1/measurements uses has_more + next
+    with an authenticated snapshot cursor bound to its filters.'
+- id: strict-query-validation
+  conforms: true
+  evidence: 'Unknown query parameters are rejected with 400 {error: unknown_query_parameter, unknown_parameters:
+    [...]} on every read route (observed on ?bogus=1).'
+- id: idempotency
+  conforms: true
+  coverage: partial
+  evidence: Idempotency-Key header is REQUIRED on POST /api/v1/proposals/{slug}/work-notices (in the spec), documented
+    on POST /api/v1/reports (409 on reuse with different content) and on the moderation slug rename; not on proposals,
+    seconds, measurements or votes. See conventions/ainglish-org-conventions.yml.
+- id: rfc9110-conditional-requests
+  conforms: true
+  evidence: ETag / If-None-Match with 304 declared on register.canonical, register/reference.md and attempt manifests;
+    ETag observed on /feed.xml.
+- id: rfc9530-content-digest
+  conforms: true
+  evidence: Content-Digest response header declared on GET /api/v1/attempts/{attemptId}/manifest.
+- id: rfc8785-json-canonicalization
+  conforms: true
+  evidence: application/jcs+json on getRegisterCanonical; changelog entry_hash_recipe uses JCS; register digest
+    recipe sha256(JCS({...})).
+- id: opentimestamps
+  conforms: true
+  evidence: GET /api/v1/anchors and /anchor/{version}.ots publish OpenTimestamps proofs per register version; uploadAnchor
+    summary names OpenTimestamps; GET /api/v1/health anchoring.status current.
+- id: hmac-signed-webhooks
+  conforms: true
+  evidence: 'createWebhook: X-Ainglish-Signature == HMAC-SHA256(secret, raw body); X-Ainglish-Delivery for dedupe;
+    at-least-once.'
+- id: cors
+  conforms: true
+  evidence: 'Access-Control-Allow-Origin: * with Allow-Methods GET, POST, DELETE, OPTIONS and Allow-Headers Authorization,
+    Content-Type, DPoP observed on GET /api/v1.'
+- id: atom-1.0
+  conforms: true
+  evidence: /feed.xml is application/atom+xml (Atom 1.0 namespace) with ETag; llms.txt says it supports ETag/304.
+- id: cc0-1.0
+  conforms: true
+  evidence: 'GET /api/v1 license {spdx: CC0-1.0, scope: ...}; /public-domain and /contribution-terms; release bundles
+    carry SHA256SUMS.'
+- id: datacite-doi
+  conforms: true
+  evidence: Concept DOI 10.5281/zenodo.22095467 and version DOI 10.5281/zenodo.22849320 published on /cite and in
+    llms.txt for the language releases (Zenodo deposits). Not declared in the OpenAPI, so not counted as the contract's
+    domain-standard signature.
+- id: citation-cff
+  conforms: true
+  evidence: CITATION.cff in github.com/ai-nglish/ainglish.
+- id: mlcommons-croissant
+  conforms: true
+  evidence: 'llms.txt: training packs ship in JSONL, Parquet, Dolma and Croissant formats (ainglish-training-v4
+    MANIFEST.json). Dataset-level, not in the API contract.'
+- id: compliance-certifications
+  conforms: false
+  evidence: 'No SOC 2 / ISO 27001 / trust center published (probe-security-programs.py: vdp=none trust=none; /security
+    404). No Compliance pointer emitted.'

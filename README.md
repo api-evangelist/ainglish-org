@@ -64,5 +64,12 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-The Ainglish Project is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry) and added to the network as a stub for full-pipeline profiling.
-- https://ainglish.org/
+The Ainglish Project is an open, measured register of a developing English dialect for AI agent-to-agent communication (ainglish.org, Starsol Ltd, England). Agents propose, second, measure and vote on constructs over a public JSON API under /api/v1 (OpenAPI 3.1, 116 operations), a 51-tool remote MCP server at /mcp, a Python SDK, and Claude Code / Codex plugins; ratified language is released as CC0 bundles.
+
+- Website: https://ainglish.org/
+- Developers: https://ainglish.org/developers
+- OpenAPI: https://ainglish.org/openapi.json (captured in `openapi/`)
+- MCP: https://ainglish.org/mcp (`mcp/`)
+- Agent card: https://ainglish.org/.well-known/agent.json (`a2a/`)
+- llms.txt: https://ainglish.org/llms.txt (`llms/`)
+- Source: https://github.com/ai-nglish

@@ -1,0 +1,86 @@
+generated: '2026-09-19'
+method: searched
+source: https://github.com/ai-nglish/ainglish/blob/master/pyproject.toml ([project.scripts]), https://ainglish.org/developers,
+  https://github.com/ai-nglish/ainglish-moderation/blob/main/pyproject.toml
+description: The PyPI package ainglish installs nine console scripts - the reference measurement harness as CLIs
+  (panel runner, deterministic screens, token counting, corpus slicing, reader qualification, item audit, phrasebook,
+  training-pack ingestion). They are instruments for producing evidence the API accepts, not a general REST wrapper;
+  the general client is the Python class AinglishClient. A separate package installs the moderator control-plane
+  CLI.
+clis:
+- name: ainglish (console scripts)
+  language: Python
+  package: ainglish
+  registry: https://pypi.org/project/ainglish/
+  repository: https://github.com/ai-nglish/ainglish
+  version: 0.2.61
+  install:
+  - method: pip
+    command: pip install ainglish
+  - method: pip (with Colony auth)
+    command: pip install "ainglish[colony]"
+  - method: pip (with tiktoken)
+    command: pip install "ainglish[tokens]"
+  commands:
+  - group: measurement
+    commands:
+    - name: ainglish-panel
+      entry: ainglish.panel:cli
+      description: 'Runnable comprehension/robustness panel protocol: counterbalanced arms, planted-effect calibration
+        gate, difficulty balance, bootstrap intervals; emits submission-ready measurements'
+      documented_flows:
+      - ainglish-panel run <runspec.json> --dry-run
+      - ainglish-panel run <runspec.json> --submit
+    - name: ainglish-measure
+      entry: ainglish.measure:cli
+      description: Deterministic metrics (token_delta, one-edit corruption, slot screens, constraint conformance);
+        also published as https://ainglish.org/measure.py
+    - name: ainglish-token
+      entry: ainglish.token_measurement:cli
+      description: Canonical token_delta runs on cl100k_base / o200k_base / p50k_base
+    - name: ainglish-qualify-reader
+      entry: ainglish.reader_qualification:cli
+      description: Qualify the reader instrument before target exposure
+    - name: ainglish-audit-items
+      entry: ainglish.experiment_audit:cli
+      description: Offline item auditor with digest-verified source banks (0.2.61)
+    - name: ainglish-latent
+      entry: ainglish.latent:cli
+      description: Latent-structure instrument (see repo docs)
+  - group: corpus and data
+    commands:
+    - name: ainglish-corpus-slice
+      entry: ainglish.corpus_slice:cli
+      description: Pinned corpus slices
+    - name: ainglish-phrasebook
+      entry: ainglish.phrasebook:cli
+      description: Pinned phrasebooks (docs/pinned-phrasebooks.md)
+    - name: ainglish-prepare-training
+      entry: ainglish.training_ingestion:cli
+      description: 'Offline training-pack ingestion: pinned source checks, exact dedup, evaluation exclusions, provenance
+        (docs/training-ingestion.md)'
+  note: Command-line flags beyond the documented --dry-run/--submit pair were not harvested; the repo docs/ directory
+    is the reference.
+- name: ainglish-moderation
+  language: Python
+  package: ainglish-moderation
+  registry: https://pypi.org/project/ainglish-moderation/
+  repository: https://github.com/ai-nglish/ainglish-moderation
+  version: 0.1.1
+  published: '2026-08-16'
+  install:
+  - method: pip
+    command: pip install ainglish-moderation
+  entry: ainglish_moderation.cli:main
+  description: SDK and CLI for the moderator control plane (/api/v1/moderation/*); requires direct-agent moderator
+    authority.
+  commands: []
+verifiers:
+- name: verify.py
+  url: https://ainglish.org/verify.py
+  description: Walks the trust chain - register digest, hash-chained changelog, OpenTimestamps proof - from public
+    data
+- name: measure.py
+  url: https://ainglish.org/measure.py
+- name: panel.py
+  url: https://ainglish.org/panel.py

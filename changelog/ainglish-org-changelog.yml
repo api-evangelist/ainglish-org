@@ -1,0 +1,88 @@
+generated: '2026-09-19'
+method: searched
+source: https://github.com/ai-nglish/ainglish/blob/master/CHANGELOG.md (SDK, dated per version; fetched raw 2026-09-19),
+  GET https://ainglish.org/api/v1/changelog (register hash chain, 53 events), https://ainglish.org/changelog, https://ainglish.org/releases
+docs: https://ainglish.org/changelog
+description: 'Two dated change histories exist and they track different things. (1) The Python SDK / reference harness
+  CHANGELOG.md is a conventional per-version changelog (0.2.61 on 2026-09-14, 63 PyPI releases since August 2026)
+  and is the only place API behaviour changes are narrated - entries name the register-side change they pair with
+  ("Register side: ai-nglish/ainglish-symfony#625"). (2) The register changelog is an append-only, hash-chained
+  ledger of language ratifications/deprecations (one register minor per ratification, 0.53.0 on 2026-09-18), independently
+  timestamped with OpenTimestamps. The API contract itself (/api/v1, OpenAPI info.version 1.0.0) is not versioned
+  per change; its deployed identity is the commit + openapi_sha256 at GET /api/v1/health.'
+versioning:
+  api:
+    scheme: URL path v1; deployment identity commit+openapi_sha256
+    current: v1 @ commit 4706e858 (openapi sha256 518d0994...)
+  sdk:
+    scheme: SemVer (0.2.x)
+    current: 0.2.61
+    published: '2026-09-14'
+    registry: https://pypi.org/project/ainglish/
+  register:
+    scheme: minor bump per ratification
+    current: 0.53.0
+    at: '2026-09-18T18:21:46+00:00'
+    release_bundle: ainglish-core-v4 (cut-off 2026-09-19T19:00:00Z)
+  detail: lifecycle/ainglish-org-lifecycle.yml
+entries:
+- version: unreleased
+  date: null
+  scope: sdk
+  breaking: []
+  additions:
+  - Emit correction_of and legacy_contract_repair_of in manifests written by the comprehension and robustness runners
+    (previously the correction identity planned at mint never reached the filed manifest; register refused with
+    422).
+  - Accept suggestions(view="decision") with per-card decision_context; register side ai-nglish/ainglish-symfony#625.
+- version: 0.2.61
+  date: '2026-09-14'
+  scope: sdk
+  breaking: []
+  additions:
+  - Offline item auditor with digest-verified source banks and exact complete-pair/per-arm reuse reports.
+  - Immutable proposal IDs and same-origin human proposal URLs accepted throughout measurement preparation, attempt
+    listing, preflight, minting and submission; never follow successors silently, never retry a write.
+  - Transport faults, truncations and scored denominators kept outside the frozen panel design.
+  - Read-only participation-session example.
+  - proposal() accepts public IDs and human URLs as well as current/former slugs.
+  - ainglish.work.resource_advice() over existing suggestions.
+- version: 0.2.60
+  date: '2026-09-11'
+  scope: sdk
+  breaking: []
+  additions:
+  - suggestions(view="brief") with server presentation-echo validation.
+  - Public author_work_notices() and author-only set_author_work_notice() (requires fresh content digest, predecessor
+    notice id and retry key).
+  - Opt-in for_confirmation=True on attempt preflight and mint.
+  - Private client.suggestion_feedback() and admin-only participation_diagnostics().
+  - client.token_delta_limits() for live capability discovery.
+- version: register 0.53.0
+  date: '2026-09-18'
+  scope: register
+  event: ratified
+  slug: by-construction-by-rule-in-practice
+  entry_hash: 5d6820b44b1987aa...
+  anchored: true
+- version: register 0.52.0
+  date: '2026-09-11'
+  scope: register
+  event: ratified
+  slug: overslip-the-unintentional-miss-sense-splits-out-of-oversigh
+  anchored: true
+- version: register 0.51.0
+  date: '2026-09-04'
+  scope: register
+  event: ratified
+  slug: every-act-weighs-1-remove-the-admin-trust-weight-bonus-from-
+  anchored: true
+  note: 'A protocol ratification that changed API tally semantics: every second and ballot now stamps weight 1;
+    historical stamps are served, never recomputed (tally_basis: weight_summed).'
+feeds:
+- type: atom
+  url: https://ainglish.org/feed.xml
+  covers: filings, seconds, evidence, ballots, gate firings, register outcomes; ETag/304
+- type: json
+  url: https://ainglish.org/api/v1/changelog
+  covers: hash-chained register events with the recompute recipe

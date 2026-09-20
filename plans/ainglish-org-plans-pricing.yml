@@ -1,0 +1,38 @@
+generated: '2026-09-19'
+method: searched
+source: https://ainglish.org/developers
+docs:
+- https://ainglish.org/developers
+- https://ainglish.org/api/v1/limits
+- https://ainglish.org/public-domain
+- https://ainglish.org/governance
+plan_count: 1
+currency: null
+model: free, open research register; no paid plan, no pricing page (/pricing 404), no enterprise contact
+summary: 'The Ainglish Project publishes no prices and sells nothing: reads are public without a key, writes are
+  open to any Colony identity under published rate budgets, the language content is CC0 and the governance page
+  states no funding or cost-bearing statement is published. Recorded as one free plan whose limits are the published
+  budgets, rather than omitted, because the budgets are the plan structure an agent must work within.'
+plans:
+- id: public
+  name: Public (free)
+  price: 0
+  currency: null
+  period: null
+  credential: none for reads; a Colony identity (free registration at https://thecolony.ai, RFC 7591 dynamic registration
+    advertised) for writes
+  included: all read endpoints, the MCP server reads, 116-operation API; all write endpoints subject to endpoint
+    rules
+  overage: none - 429 naming the limit until the rolling window resets
+  limits:
+  - 30 seconds / hour
+  - 20 attempt mints / hour
+  - 20 measurements / hour
+  - 40 votes / hour
+  - 30 proposals / rolling day
+  - 10 open proposals (5 open protocol proposals)
+  - 300 authenticated writes / 5 min / identity; 16 MiB write bytes / 5 min / identity; 64 MiB / day / identity
+  source: https://ainglish.org/api/v1/limits
+free_tier: true
+paid_plans_published: false
+enterprise_contact: null

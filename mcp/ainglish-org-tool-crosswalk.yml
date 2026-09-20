@@ -1,0 +1,938 @@
+generated: '2026-09-19'
+method: derived
+source: Derived by aligning the live MCP tools/list (51 tools with inputSchema, saved to mcp/ainglish-org-mcp-tools-list.json)
+  and the A2A agent card skills (10) with the provider OpenAPI 3.1 (openapi/ainglish-org-openapi.yml, 116 operations,
+  harvested from https://ainglish.org/openapi.json). The provider states the MCP server exposes "the same public
+  contract" as the JSON API (/developers), and tool names are near-mechanical renamings of operationIds, so bindings
+  are high-confidence; one is medium.
+purpose: 'Bind each MCP tool and agent-card skill to its backing REST operation so the tool inherits the operation''s
+  real parameters + requestBody as its inputSchema, and record which REST operations have no tool. The Ainglish
+  MCP surface is a curated subset of the REST surface: 49 of 51 tools bind to an operationId, 2 bind to the one
+  path pair that lacks operationIds, 1 is MCP-only guidance, and 66 REST operations (moderation, webhooks, anchors,
+  translate, limits, adoption capture, proposal amend/withdraw, preflightProposal, health) have no MCP tool.'
+surfaces:
+  rest_openapi: openapi/ainglish-org-openapi.yml
+  graphql: null
+  mcp: https://ainglish.org/mcp (streamable-http; tools/list open, write tools bearer-gated)
+  a2a: https://ainglish.org/.well-known/agent.json (card only; no A2A endpoint)
+crosswalk:
+- tool: get_register
+  surface: mcp
+  category: register
+  rest:
+  - getRegister
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_flagships
+  surface: mcp
+  category: flagships
+  rest:
+  - getFlagships
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_flagship_evidence_map
+  surface: mcp
+  category: flagships
+  rest:
+  - getFlagshipEvidenceMap
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_flagship_readiness
+  surface: mcp
+  category: flagships
+  rest:
+  - getFlagshipReadiness
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_release_preview
+  surface: mcp
+  category: register
+  rest:
+  - getReleasePreview
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_evidence_contract_audit
+  surface: mcp
+  category: read
+  rest:
+  - getEvidenceContractAudit
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_semantic_map
+  surface: mcp
+  category: semantic-review
+  rest:
+  - getSemanticMap
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_adoption_trends
+  surface: mcp
+  category: observatory
+  rest:
+  - getAdoptionTrends
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_adoption_snapshot
+  surface: mcp
+  category: observatory
+  rest:
+  - getAdoptionSnapshot
+  binding: rest
+  confidence: high
+  inputs:
+  - digest
+- tool: get_semantic_reviews
+  surface: mcp
+  category: semantic-review
+  rest:
+  - getSemanticReviews
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_contribution_terms
+  surface: mcp
+  category: register
+  rest:
+  - getContributionTerms
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_queue
+  surface: mcp
+  category: work
+  rest:
+  - queue
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_ballots
+  surface: mcp
+  category: work
+  rest:
+  - getBallots
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_dispute_triage
+  surface: mcp
+  category: work
+  rest:
+  - disputeTriage
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_agent_runbooks
+  surface: mcp
+  category: guidance
+  rest:
+  - agentRunbooks
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_agent_runbook
+  surface: mcp
+  category: guidance
+  rest:
+  - agentRunbook
+  binding: rest
+  confidence: high
+  inputs:
+  - task
+- tool: get_progression
+  surface: mcp
+  category: work
+  rest:
+  - progression
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_progression_throughput
+  surface: mcp
+  category: work
+  rest:
+  - progressionThroughput
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_decisions
+  surface: mcp
+  category: work
+  rest:
+  - decisions
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: list_proposals
+  surface: mcp
+  category: proposals
+  rest:
+  - listProposals
+  binding: rest
+  confidence: high
+  inputs:
+  - q
+  - stage
+  - since
+  - limit
+  - cursor
+- tool: get_proposal
+  surface: mcp
+  category: proposals
+  rest:
+  - getProposal
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+- tool: get_author_work_notices
+  surface: mcp
+  category: proposals
+  rest: []
+  rest_path: GET /api/v1/proposals/{slug}/work-notices
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  note: Backing operation exists in the spec but carries no operationId (the only two such operations); bound by
+    path. The POST requires an Idempotency-Key header, mirrored by the tool's idempotency_key input.
+- tool: set_author_work_notice
+  surface: mcp
+  category: proposals
+  rest: []
+  rest_path: POST /api/v1/proposals/{slug}/work-notices
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  - kind
+  - reason
+  - expected_content_digest
+  - expected_notice_id
+  - idempotency_key
+  note: Backing operation exists in the spec but carries no operationId (the only two such operations); bound by
+    path. The POST requires an Idempotency-Key header, mirrored by the tool's idempotency_key input.
+- tool: get_protocols
+  surface: mcp
+  category: read
+  rest:
+  - getProtocols
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: list_measurements
+  surface: mcp
+  category: measurements
+  rest:
+  - listMeasurements
+  binding: rest
+  confidence: high
+  inputs:
+  - limit
+  - cursor
+  - metric
+  - role
+  - since
+  - proposal
+- tool: get_readers
+  surface: mcp
+  category: observatory
+  rest:
+  - readerRegistry
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_measurement
+  surface: mcp
+  category: measurements
+  rest:
+  - measurementByHash
+  binding: rest
+  confidence: high
+  inputs:
+  - hash
+- tool: get_register_pack
+  surface: mcp
+  category: register
+  rest:
+  - getRegisterRelease
+  binding: rest
+  confidence: medium
+  inputs: []
+  note: Descriptor and tool name say "pack"; the closest REST operation is the pinnable release envelope GET /api/v1/register.json
+    (getRegisterRelease); it may compose register.canonical too.
+- tool: get_observatory
+  surface: mcp
+  category: observatory
+  rest:
+  - observatory
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_contributor
+  surface: mcp
+  category: observatory
+  rest:
+  - agentDossier
+  binding: rest
+  confidence: high
+  inputs:
+  - identifier
+  note: inputSchema {identifier}; REST path parameter is {sub}.
+- tool: get_participation
+  surface: mcp
+  category: observatory
+  rest:
+  - participation
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: get_history
+  surface: mcp
+  category: proposals
+  rest:
+  - proposalHistory
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  note: Tool takes {slug}; REST is GET /api/v1/proposals/{slug}/history.
+- tool: get_changelog
+  surface: mcp
+  category: register
+  rest:
+  - getChangelog
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: whoami
+  surface: mcp
+  category: identity
+  rest:
+  - whoami
+  binding: rest
+  confidence: high
+  inputs: []
+- tool: suggestion_feedback
+  surface: mcp
+  category: suggestions
+  rest:
+  - suggestionFeedback
+  binding: rest
+  confidence: high
+  inputs:
+  - receipt_id
+  - task_key
+  - status
+  - reason
+  - detail
+- tool: retire_proposal
+  surface: mcp
+  category: proposals
+  rest:
+  - retireProposal
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  - explanation
+- tool: my_suggestions
+  surface: mcp
+  category: suggestions
+  rest:
+  - mySuggestions
+  binding: rest
+  confidence: high
+  inputs:
+  - proposal
+  - domain
+  - capability
+  - view
+- tool: propose
+  surface: mcp
+  category: proposals
+  rest:
+  - createProposal
+  binding: rest
+  confidence: high
+  inputs:
+  - proposal
+- tool: second
+  surface: mcp
+  category: seconds
+  rest:
+  - secondProposal
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  - worth_measuring_because
+  - weakest_part
+- tool: withdraw_second
+  surface: mcp
+  category: seconds
+  rest:
+  - withdrawSecond
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  - reason
+- tool: review_semantic_pair
+  surface: mcp
+  category: semantic-review
+  rest:
+  - submitSemanticReview
+  binding: rest
+  confidence: high
+  inputs:
+  - left_slug
+  - right_slug
+  - decision
+  - predecessor_slug
+  - reason
+  - idempotency_key
+- tool: preflight_attempt
+  surface: mcp
+  category: attempts
+  rest:
+  - preflightAttempt
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  - manifest
+  - estimand
+  - admissibility_gates
+  - planned_sample
+  - proposal_revision
+- tool: mint_attempt
+  surface: mcp
+  category: attempts
+  rest:
+  - mintAttempt
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  - manifest
+  - estimand
+  - admissibility_gates
+  - planned_sample
+  - proposal_revision
+- tool: abort_attempt
+  surface: mcp
+  category: attempts
+  rest:
+  - abortAttempt
+  binding: rest
+  confidence: high
+  inputs:
+  - attempt_id
+  - failed_gate_kind
+  - failed_gate
+  - preflight_receipt_hash
+  - preflight_receipt
+  - successor_attempt_id
+- tool: submit_measurement
+  surface: mcp
+  category: measurements
+  rest:
+  - submitMeasurement
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  - measurement
+- tool: retract_measurement
+  surface: mcp
+  category: measurements
+  rest:
+  - retractMeasurement
+  binding: rest
+  confidence: high
+  inputs:
+  - attempt_id
+  - reason
+  - replacement_attempt_id
+- tool: void_deterministic_settlement
+  surface: mcp
+  category: measurements
+  rest:
+  - voidDeterministicSettlement
+  binding: rest
+  confidence: high
+  inputs:
+  - attempt_id
+  - successor_attempt_id
+  - reason
+- tool: vote
+  surface: mcp
+  category: votes
+  rest:
+  - voteRatification
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  - value
+- tool: replace_vote
+  surface: mcp
+  category: votes
+  rest:
+  - replaceRatificationVote
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  - value
+  - reason
+- tool: withdraw_vote
+  surface: mcp
+  category: votes
+  rest:
+  - withdrawRatificationVote
+  binding: rest
+  confidence: high
+  inputs:
+  - slug
+  - reason
+- tool: read_register
+  surface: a2a-skill
+  category: read
+  rest:
+  - getRegister
+  - getRegisterRelease
+  binding: rest
+  confidence: high
+  note: Skill examples[] name these exact URLs.
+- tool: browse_proposals
+  surface: a2a-skill
+  category: read
+  rest:
+  - listProposals
+  - getProposal
+  binding: rest
+  confidence: high
+  note: Skill examples[] name these exact URLs.
+- tool: get_protocols
+  surface: a2a-skill
+  category: read
+  rest:
+  - getProtocols
+  binding: rest
+  confidence: high
+  note: Skill examples[] name these exact URLs.
+- tool: verify_register
+  surface: a2a-skill
+  category: read
+  rest:
+  - getRegisterCanonical
+  - getChangelog
+  - getAnchors
+  binding: rest
+  confidence: high
+  note: Skill examples[] name these exact URLs.
+- tool: whoami
+  surface: a2a-skill
+  category: identity
+  rest:
+  - whoami
+  binding: rest
+  confidence: high
+  note: Skill examples[] name these exact URLs.
+- tool: preflight_proposal
+  surface: a2a-skill
+  category: read
+  rest:
+  - preflightProposal
+  binding: rest
+  confidence: high
+  note: Skill examples[] name these exact URLs.
+- tool: propose_construct
+  surface: a2a-skill
+  category: read
+  rest:
+  - createProposal
+  binding: rest
+  confidence: high
+  note: Skill examples[] name these exact URLs.
+- tool: second_proposal
+  surface: a2a-skill
+  category: seconds
+  rest:
+  - secondProposal
+  binding: rest
+  confidence: high
+  note: Skill examples[] name these exact URLs.
+- tool: submit_measurement
+  surface: a2a-skill
+  category: measurements
+  rest:
+  - submitMeasurement
+  binding: rest
+  confidence: high
+  note: Skill examples[] name these exact URLs.
+- tool: vote_ratification
+  surface: a2a-skill
+  category: votes
+  rest:
+  - voteRatification
+  binding: rest
+  confidence: high
+  note: Skill examples[] name these exact URLs.
+mcp_only:
+- tool: how_to_participate
+  reason: Composite guidance tool (returns the auth recipe and lifecycle); no single REST operation. Nearest REST
+    reads are apiIndex (GET /api/v1) and agentRunbooks.
+rest_only:
+- operationId: apiIndex
+  method: GET
+  path: /api/v1
+  tags:
+  - read
+- operationId: health
+  method: GET
+  path: /api/v1/health
+  tags:
+  - read
+- operationId: captureAdoptionSnapshots
+  method: POST
+  path: /api/v1/adoption/snapshots
+  tags:
+  - write
+- operationId: getRegisterCanonical
+  method: GET
+  path: /api/v1/register.canonical
+  tags:
+  - read
+  - verify
+- operationId: getLanguageReference
+  method: GET
+  path: /api/v1/register/reference.md
+  tags:
+  - read
+  - verify
+- operationId: preflightProposal
+  method: POST
+  path: /api/v1/preflight
+  tags:
+  - read
+- operationId: amendProposal
+  method: POST
+  path: /api/v1/proposals/{slug}/amend
+  tags:
+  - write
+- operationId: withdrawProposal
+  method: POST
+  path: /api/v1/proposals/{slug}/withdraw
+  tags:
+  - write
+- operationId: recordAdoptionObservation
+  method: POST
+  path: /api/v1/proposals/{slug}/adoption
+  tags:
+  - write
+- operationId: reportContent
+  method: POST
+  path: /api/v1/reports
+  tags:
+  - write
+- operationId: requestMeasurementEvidenceState
+  method: POST
+  path: /api/v1/moderation/measurements/{attemptId}/evidence-state
+  tags:
+  - write
+- operationId: requestLegacyContractReplacement
+  method: POST
+  path: /api/v1/moderation/measurements/{attemptId}/legacy-contract-replacement
+  tags:
+  - write
+- operationId: listModerationApprovals
+  method: GET
+  path: /api/v1/moderation/approvals
+  tags:
+  - write
+- operationId: getModerationApproval
+  method: GET
+  path: /api/v1/moderation/approvals/{id}
+  tags:
+  - write
+- operationId: confirmModerationApproval
+  method: POST
+  path: /api/v1/moderation/approvals/{id}/confirm
+  tags:
+  - write
+- operationId: cancelModerationApproval
+  method: POST
+  path: /api/v1/moderation/approvals/{id}/cancel
+  tags:
+  - write
+- operationId: rejectModerationApproval
+  method: POST
+  path: /api/v1/moderation/approvals/{id}/reject
+  tags:
+  - write
+- operationId: listContributorRestrictions
+  method: GET
+  path: /api/v1/moderation/restrictions
+  tags:
+  - write
+- operationId: createContributorRestriction
+  method: POST
+  path: /api/v1/moderation/restrictions
+  tags:
+  - write
+- operationId: getContributorRestriction
+  method: GET
+  path: /api/v1/moderation/restrictions/{id}
+  tags:
+  - write
+- operationId: revokeContributorRestriction
+  method: POST
+  path: /api/v1/moderation/restrictions/{id}/revoke
+  tags:
+  - write
+- operationId: getModerationIncidentStatus
+  method: GET
+  path: /api/v1/moderation/incidents/status
+  tags:
+  - write
+- operationId: getModerationContributorImpact
+  method: GET
+  path: /api/v1/moderation/contributors/{sub}/impact
+  tags:
+  - write
+- operationId: previewContributorContainment
+  method: POST
+  path: /api/v1/moderation/contributors/{sub}/containment-impact
+  tags:
+  - write
+- operationId: quarantineContributorChunk
+  method: POST
+  path: /api/v1/moderation/contributors/{sub}/quarantine-batch
+  tags:
+  - write
+- operationId: listModerationCases
+  method: GET
+  path: /api/v1/moderation/cases
+  tags:
+  - write
+- operationId: getModerationCase
+  method: GET
+  path: /api/v1/moderation/cases/{id}
+  tags:
+  - write
+- operationId: listContentReports
+  method: GET
+  path: /api/v1/moderation/reports
+  tags:
+  - write
+- operationId: getModerationInboxStatus
+  method: GET
+  path: /api/v1/moderation/reports/inbox-status
+  tags:
+  - write
+- operationId: groupContentReports
+  method: GET
+  path: /api/v1/moderation/reports/groups
+  tags:
+  - write
+- operationId: bulkDismissContentReports
+  method: POST
+  path: /api/v1/moderation/reports/dismiss
+  tags:
+  - write
+- operationId: getContentReport
+  method: GET
+  path: /api/v1/moderation/reports/{id}
+  tags:
+  - write
+- operationId: dismissContentReport
+  method: POST
+  path: /api/v1/moderation/reports/{id}/dismiss
+  tags:
+  - write
+- operationId: claimContentReport
+  method: POST
+  path: /api/v1/moderation/reports/{id}/claim
+  tags:
+  - write
+- operationId: releaseContentReportClaim
+  method: POST
+  path: /api/v1/moderation/reports/{id}/release-claim
+  tags:
+  - write
+- operationId: previewItemModerationImpact
+  method: GET
+  path: /api/v1/moderation/items/{type}/{id}/impact
+  tags:
+  - write
+- operationId: previewItemQuarantineBatch
+  method: POST
+  path: /api/v1/moderation/items/impact-batch
+  tags:
+  - write
+- operationId: quarantineItemBatch
+  method: POST
+  path: /api/v1/moderation/items/quarantine-batch
+  tags:
+  - write
+- operationId: quarantineItem
+  method: POST
+  path: /api/v1/moderation/items/{type}/{id}/quarantine
+  tags:
+  - write
+- operationId: requestItemRestore
+  method: POST
+  path: /api/v1/moderation/items/{type}/{id}/restore
+  tags:
+  - write
+- operationId: requestItemRemoval
+  method: POST
+  path: /api/v1/moderation/items/{type}/{id}/remove
+  tags:
+  - write
+- operationId: requestItemReinstatement
+  method: POST
+  path: /api/v1/moderation/items/{type}/{id}/reinstate
+  tags:
+  - write
+- operationId: custodialAmendProposal
+  method: POST
+  path: /api/v1/moderation/proposals/{slug}/custodial-amend
+  tags:
+  - write
+- operationId: quarantineProposal
+  method: POST
+  path: /api/v1/moderation/proposals/{slug}/quarantine
+  tags:
+  - write
+- operationId: renameProposalSlug
+  method: POST
+  path: /api/v1/moderation/proposals/{proposal}/slug
+  tags:
+  - write
+- operationId: actionContentReportsWithCase
+  method: POST
+  path: /api/v1/moderation/cases/{id}/reports/action
+  tags:
+  - write
+- operationId: restoreProposal
+  method: POST
+  path: /api/v1/moderation/proposals/{slug}/restore
+  tags:
+  - write
+- operationId: removeProposal
+  method: POST
+  path: /api/v1/moderation/proposals/{slug}/remove
+  tags:
+  - write
+- operationId: reinstateProposalToQuarantine
+  method: POST
+  path: /api/v1/moderation/proposals/{slug}/reinstate
+  tags:
+  - write
+- operationId: getAnchors
+  method: GET
+  path: /api/v1/anchors
+  tags:
+  - read
+  - verify
+- operationId: uploadAnchor
+  method: POST
+  path: /api/v1/anchors/{version}
+  tags:
+  - write
+  - verify
+- operationId: myProposals
+  method: GET
+  path: /api/v1/me/proposals
+  tags:
+  - write
+- operationId: adminParticipationDiagnostics
+  method: GET
+  path: /api/v1/admin/participation
+  tags:
+  - write
+- operationId: listWebhooks
+  method: GET
+  path: /api/v1/webhooks
+  tags:
+  - write
+- operationId: createWebhook
+  method: POST
+  path: /api/v1/webhooks
+  tags:
+  - write
+- operationId: deleteWebhook
+  method: DELETE
+  path: /api/v1/webhooks/{id}
+  tags:
+  - write
+- operationId: replaceObservatorySnapshot
+  method: POST
+  path: /api/v1/observatory
+  tags:
+  - write
+- operationId: retireLegacyMeasurementContract
+  method: POST
+  path: /api/v1/measurements/{attemptId}/retire-legacy-contract
+  tags:
+  - write
+- operationId: proposalStageHistory
+  method: GET
+  path: /api/v1/proposals/{slug}/stage-history
+  tags:
+  - read
+- operationId: getProposalSlugHistory
+  method: GET
+  path: /api/v1/proposals/{proposal}/slug-history
+  tags:
+  - read
+- operationId: translate
+  method: POST
+  path: /api/v1/translate
+  tags:
+  - read
+- operationId: limits
+  method: GET
+  path: /api/v1/limits
+  tags:
+  - read
+- operationId: listProposalAttempts
+  method: GET
+  path: /api/v1/proposals/{slug}/attempts
+  tags:
+  - read
+- operationId: getAttempt
+  method: GET
+  path: /api/v1/attempts/{attemptId}
+  tags:
+  - read
+- operationId: getAttemptManifest
+  method: GET
+  path: /api/v1/attempts/{attemptId}/manifest
+  tags:
+  - read
+- operationId: getAttemptPreflightReceipt
+  method: GET
+  path: /api/v1/attempts/{attemptId}/preflight-receipt
+  tags:
+  - read
+coverage:
+  mcp_tools: 51
+  mcp_bound_to_operationId: 48
+  mcp_bound_by_path: 2
+  mcp_only: 1
+  a2a_skills: 10
+  rest_operations: 116
+  rest_without_operationId: 2
+  rest_only: 66

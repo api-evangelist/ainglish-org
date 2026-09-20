@@ -1,0 +1,53 @@
+generated: '2026-09-19'
+method: searched
+source: https://ainglish.org/openapi.json (info.version, /api/v1 prefix), GET https://ainglish.org/api/v1 (version
+  "1", register_version), GET https://ainglish.org/api/v1/health (deployment identity), https://ainglish.org/developers,
+  https://ainglish.org/releases (release cadence), https://github.com/ai-nglish/ainglish/blob/master/CHANGELOG.md,
+  https://ainglish.org/changelog; /status and /pricing probed 404 on 2026-09-19.
+versioning:
+  scheme: URL path major version
+  mechanism: Every operation lives under /api/v1/; the OpenAPI info.version is 1.0.0 and the index reports version
+    "1". The deployed release is publicly identified at GET /api/v1/health as {commit, openapi_sha256} ("git-commit+openapi-sha256-v1"),
+    so a client can pin the exact contract it read.
+  current: v1
+  deployed_commit: 4706e858d43648f317e729547084560d2d022b2f
+  openapi_sha256: 518d0994621d2a83fbfa1b1da0aaa2d933d1d49dbe9c4286507e6a11a38608f7
+  docs: https://ainglish.org/developers
+  notes: No version header and no date pinning. The REGISTER (the data) is versioned separately - register 0.53.0
+    on 2026-09-18, one minor per ratification - and released as immutable CC0 bundles (ainglish-core-v4).
+deprecation:
+  policy_url: null
+  changelog: https://github.com/ai-nglish/ainglish/blob/master/CHANGELOG.md
+  sunset_header: false
+  notes: No API deprecation policy and no RFC 8594 Deprecation/Sunset headers; no operation is marked deprecated.
+    The docs keep "the historic slug contract" (public_id added beside slug) and the SDK changelog records compatibility
+    aliases (whoami/me) rather than removals. Note the word "deprecated" on this site refers to LANGUAGE constructs
+    (deprecated_reason recert_regression / no_adoption), which is the register lifecycle, not the API lifecycle.
+status_page: null
+status_page_note: /status returns the site 404. GET /api/v1/health is a public liveness probe ({ok, service, phase,
+  deployment, anchoring}) and GET /api/v1/observatory publishes scanner liveness (on_schedule/overdue, valid/expired),
+  but no uptime history or incident page exists.
+health_endpoint: https://ainglish.org/api/v1/health
+sla:
+  url: null
+  public_uptime_target: null
+  notes: No SLA; the governance page states no verified funding or cost-bearing statement is published.
+release_cadence:
+  language_bundles: Routine public-domain language releases at least 168 hours apart (a minimum interval, not a
+    weekly promise); ratifications appear in the live register immediately; an earlier bundle is exceptional and
+    its reason is stated publicly.
+  sdk: PyPI ainglish 0.2.61 on 2026-09-14, 0.2.60 on 2026-09-11 (63 releases since 2026-08); CHANGELOG.md is dated
+    per version.
+  source: https://ainglish.org/releases
+data_retention:
+  source: https://ainglish.org/privacy
+  rate_limit_counters: expire within two hours (IP hashed)
+  app_error_logs: rotated, seven files retained
+  sessions: browser session
+  public_register_actions: retained for the life of the project (auditable history is the purpose)
+  participation_diagnostics: up to 30 days after the last grouped response
+rate_limits: rate-limits/ainglish-org-rate-limits.yml
+changelog_artifact: changelog/ainglish-org-changelog.yml
+deprecated_products: []
+deprecated_operations: []
+legal_last_updated: 2026-08-25 (contribution terms v1.1); privacy notice 2026-08-16
