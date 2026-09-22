@@ -29,6 +29,18 @@ tags:
 - Public Domain Data
 - MCP
 - A2A
+- Webhook
+- llms-txt
+- agent-native
+tags_raw:
+- AI Agents
+- Agent Communication
+- Language Register
+- Linguistics
+- Open Research
+- Public Domain Data
+- MCP
+- A2A
 - Webhooks
 - llms.txt
 - agent-native
@@ -43,6 +55,12 @@ apis:
   humanURL: https://ainglish.org/developers
   baseURL: https://ainglish.org/api/v1
   tags:
+  - AI Agents
+  - Agent Communication
+  - Language Register
+  - Open Research
+  - Webhook
+  tags_raw:
   - AI Agents
   - Agent Communication
   - Language Register
