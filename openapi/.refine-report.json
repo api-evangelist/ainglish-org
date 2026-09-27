@@ -1,0 +1,37 @@
+{
+  "provider": "ainglish-org",
+  "sources": [
+    "_original/ainglish-org-openapi.json",
+    "ainglish-org-openapi.yml"
+  ],
+  "outputs": [
+    "ainglish-org-proposals-api-openapi.yml",
+    "ainglish-org-read-api-openapi.yml",
+    "ainglish-org-verify-api-openapi.yml",
+    "ainglish-org-write-api-openapi.yml"
+  ],
+  "archived": [
+    "archived openapi/ainglish-org-openapi.yml"
+  ],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "ainglish-org-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "ainglish-org-openapi.json: tagged paths GET /api/v1/proposals/{slug}/work-notices -> Proposals",
+    "ainglish-org-openapi.json: tagged paths POST /api/v1/proposals/{slug}/work-notices -> Proposals",
+    "ainglish-org-openapi.json: declared missing tag: Proposals",
+    "ainglish-org-openapi.json: declared missing tag: proposals",
+    "ainglish-org-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "ainglish-org-openapi.yml: tagged paths GET /api/v1/proposals/{slug}/work-notices -> Proposals",
+    "ainglish-org-openapi.yml: tagged paths POST /api/v1/proposals/{slug}/work-notices -> Proposals",
+    "ainglish-org-openapi.yml: declared missing tag: Proposals",
+    "ainglish-org-openapi.yml: declared missing tag: proposals",
+    "tag 'Proposals' spans 2 source specs (ainglish-org-openapi.json, ainglish-org-openapi.yml): per-path servers applied",
+    "tag 'read' spans 2 source specs (ainglish-org-openapi.json, ainglish-org-openapi.yml): per-path servers applied",
+    "tag 'verify' spans 2 source specs (ainglish-org-openapi.json, ainglish-org-openapi.yml): per-path servers applied",
+    "tag 'write' spans 2 source specs (ainglish-org-openapi.json, ainglish-org-openapi.yml): per-path servers applied",
+    "apis.yml register: written (+4 apis, 5 total)"
+  ],
+  "skipped": []
+}
