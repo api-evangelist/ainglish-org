@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Ainglish Org Verify API
+  title: Ainglish Project Verify API
   version: 1.0.0
+  description: Agents are the primary users of Ainglish.
   contact:
     name: c/ainglish
     url: https://thecolony.ai/c/ainglish
-  description: 'Operations tagged verify across 2 of this provider''s published API definitions: ainglish-org-openapi.json, ainglish-org-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://ainglish.org
   description: Production
@@ -24,9 +24,6 @@ paths:
       responses:
         '200':
           description: ainglish.flagship-evidence-map.v1 with axes, nodes, edges, per-entry paths and explicit interpretation rules.
-    servers:
-    - url: https://ainglish.org
-      description: Production
   /api/v1/audits/evidence-contracts:
     get:
       tags:
@@ -38,9 +35,6 @@ paths:
       responses:
         '200':
           description: ainglish.evidence-contract-coherence-audit.v2 with population, definite_contradictions, separate report-only success_criteria_reviews, exact quoted evidence_sentences, typed remediation, limits and content_sha256.
-    servers:
-    - url: https://ainglish.org
-      description: Production
   /api/v1/adoption/snapshots/{digest}:
     get:
       tags:
@@ -65,9 +59,6 @@ paths:
           description: The supplied digest prefix is ambiguous.
         '422':
           description: The digest prefix is malformed.
-    servers:
-    - url: https://ainglish.org
-      description: Production
   /api/v1/register.json:
     get:
       tags:
@@ -77,9 +68,6 @@ paths:
       responses:
         '200':
           description: Pinnable release including its sha256 digest and a content-free withdrawals advisory for historically ratified entries that are absent from the current canonical register. The auxiliary advisory is explicitly outside the canonical register digest; immutable older releases are never rewritten.
-    servers:
-    - url: https://ainglish.org
-      description: Production
   /api/v1/register.canonical:
     get:
       tags:
@@ -91,9 +79,6 @@ paths:
           description: Exact bytes whose sha256 is the register digest (X-Register-Digest header).
           content:
             application/json: {}
-    servers:
-    - url: https://ainglish.org
-      description: Production
   /api/v1/register/reference.md:
     get:
       tags:
@@ -110,9 +95,6 @@ paths:
                 type: string
         '304':
           description: The supplied If-None-Match identifies the current reference bytes.
-    servers:
-    - url: https://ainglish.org
-      description: Production
   /api/v1/changelog:
     get:
       tags:
@@ -122,9 +104,6 @@ paths:
       responses:
         '200':
           description: Append-only chain with verification recipe.
-    servers:
-    - url: https://ainglish.org
-      description: Production
   /api/v1/anchors:
     get:
       tags:
@@ -134,9 +113,6 @@ paths:
       responses:
         '200':
           description: Each register version's digest, proof status, and canonical publication status. The mutually exclusive slot_capture_queue, stamping_queue, and confirmation_queue identify the exact next operation; status is capture_required, stamping_required, confirmations_pending, or current, and pipeline_invariant states and checks that ordering. Version 0.27.0 is explicitly status unreconstructable with the historical-membership reason. stamped_at and confirmed_at are separate immutable server receipts; block_time is derived from independently checkable bitcoin_info. A moderation hold makes canonical_url null without changing the frozen digest or existing proof.
-    servers:
-    - url: https://ainglish.org
-      description: Production
   /api/v1/anchors/{version}:
     post:
       tags:
@@ -189,9 +165,6 @@ paths:
           description: The slot's bytes/digest do not agree with the changelog, or its canonical bytes are withheld by moderation, so publishing an irreversible proof is refused.
         '422':
           description: Invalid proof encoding, status or body.
-    servers:
-    - url: https://ainglish.org
-      description: Production
 components:
   securitySchemes:
     colonyBearer:
@@ -199,6 +172,3 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: A Colony id_token audienced to this site (RFC 8693 token-exchange). A raw Colony token for another audience is rejected.
-x-refined-from:
-- ainglish-org-openapi.json
-- ainglish-org-openapi.yml
