@@ -912,6 +912,73 @@ paths:
           description: No such attempt, or it has no stored receipt bytes (including legacy aborts).
 components:
   schemas:
+    AttemptPin:
+      type: object
+      additionalProperties: false
+      required:
+      - proposal_revision
+      - manifest_commitment
+      - estimand
+      - admissibility_gates
+      - planned_sample
+      properties:
+        proposal_revision:
+          type: string
+        manifest_commitment:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        estimand:
+          type: string
+        admissibility_gates:
+          type: array
+          items: {}
+        planned_sample:
+          type: object
+    WeightedTally:
+      type: object
+      additionalProperties: false
+      required:
+      - 'yes'
+      - 'no'
+      - total
+      - tally_basis
+      properties:
+        'yes':
+          type: integer
+          minimum: 0
+          description: Sum of immutable weights on active supporting ballot rows; withdrawn rows remain public but are excluded. Not a voter headcount.
+        'no':
+          type: integer
+          minimum: 0
+          description: Sum of immutable weights on active opposing ballot rows; withdrawn rows remain public but are excluded. Not a voter headcount.
+        total:
+          type: integer
+          minimum: 0
+          description: yes + no, in units of ballot weight.
+        tally_basis:
+          type: string
+          const: weight_summed
+          description: Explicitly distinguishes this weighted sum from a voter headcount.
+    VoteWeight:
+      type: integer
+      minimum: 1
+      maximum: 3
+      description: 'Second and ballot weight. CURRENT-ACT RULE (every-act-weighs-1): every new second and ballot stamps weight 1, whoever casts it, and vote_weight on identity/participation views is therefore always 1. HISTORICAL ACT ROWS stamped before the rule may carry values up to 3 (the retired admin bonus); those stamps are immutable record, never retroactively recomputed, and still serve on old rows and in tallies of ballots that were open when the rule changed. Precisely: second advancement is a headcount of distinct active seconders (SECOND_THRESHOLD); a ballot opened after the rule change behaves as a headcount because every stamp on it is 1; a ballot that was already open when the rule changed keeps its stamped weighted tally, quorum and supermajority (tally_basis weight_summed) until it closes.'
+    WeightedBallotAct:
+      type: object
+      additionalProperties: true
+      required:
+      - value
+      - weight
+      properties:
+        value:
+          type: integer
+          enum:
+          - 1
+          - -1
+        weight:
+          $ref: '#/components/schemas/VoteWeight'
+      description: A public ballot act. weight is stamped at act time and never recomputed. value is the current value; changes preserves replacements and withdrawal, and counts_toward_tally states current effect.
     AttemptDetail:
       allOf:
       - $ref: '#/components/schemas/Attempt'
@@ -924,6 +991,298 @@ components:
             - string
             - 'null'
             description: The proposal slug this attempt belongs to.
+    Attempt:
+      type: object
+      required:
+      - attempt_id
+      - state
+      - pin
+      - manifest_storage
+      - manifest
+      - measurement_ref
+      - failed_gate_kind
+      - failed_gate
+      - preflight_receipt_hash
+      - preflight_receipt
+      - successor_attempt_id
+      - backfilled
+      - note
+      - minter
+      - created_at
+      - closed_at
+      properties:
+        attempt_id:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum:
+          - open
+          - completed
+          - aborted
+        pin:
+          $ref: '#/components/schemas/AttemptPin'
+        manifest_storage:
+          type: string
+          enum:
+          - stored_at_mint
+          - stored_at_filing
+          - commitment_only
+          description: Whether canonical bytes were retained, and whether that happened at preregistration or only on a loud backfill.
+        manifest:
+          type:
+          - object
+          - 'null'
+          additionalProperties: false
+          required:
+          - url
+          - sha256
+          - bytes
+          - media_type
+          properties:
+            url:
+              type: string
+            sha256:
+              type: string
+              pattern: ^[0-9a-f]{64}$
+            bytes:
+              type: integer
+              minimum: 1
+              maximum: 131072
+            media_type:
+              const: application/jcs+json
+          description: Immutable content-addressed locator for exact server-canonical manifest bytes; null on legacy commitment-only attempts. token_delta permits up to 131072 bytes; other metrics remain at 20000.
+        measurement_ref:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9a-f]{64}$
+          description: The completed measurement's content-addressed manifest hash; null while open or aborted. It identifies the public evidence object, while attempt_id identifies this exact lifecycle row.
+        failed_gate_kind:
+          type:
+          - string
+          - 'null'
+          enum:
+          - harness_refuse
+          - yield_guard_withhold
+          - reader_timeout
+          - reader_transport
+          - preflight_mismatch
+          - operator_interrupt
+          - harness_error
+          - no_measurement
+          - null
+          description: Machine-checkable failure class on new aborts; null on open/completed attempts and immutable legacy aborts.
+        failed_gate:
+          type:
+          - string
+          - 'null'
+        preflight_receipt_hash:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9a-f]{64}$
+        preflight_receipt:
+          type:
+          - object
+          - 'null'
+          additionalProperties: false
+          required:
+          - url
+          - sha256
+          - bytes
+          - media_type
+          properties:
+            url:
+              type: string
+            sha256:
+              type: string
+              pattern: ^[0-9a-f]{64}$
+            bytes:
+              type: integer
+              minimum: 1
+              maximum: 20000
+            media_type:
+              const: application/json
+          description: Content-addressed locator for the exact receipt bytes; null when no bytes exist, including immutable legacy aborts.
+        successor_attempt_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        backfilled:
+          type: boolean
+          description: True means this record was created retroactively or at filing time and is explicitly not mint-before-spend evidence.
+        note:
+          type:
+          - string
+          - 'null'
+        minter:
+          type: object
+          additionalProperties: false
+          required:
+          - sub
+          - name
+          properties:
+            sub:
+              type: string
+            name:
+              type: string
+        created_at:
+          type: string
+          format: date-time
+        closed_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    ParticipationResponse:
+      type: object
+      additionalProperties: true
+      required:
+      - kind
+      - contributors
+      properties:
+        contributors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParticipationContributor'
+    ProposalWeightProjection:
+      type: object
+      additionalProperties: true
+      required:
+      - seconds_count
+      - disclosed_linked_seconders
+      - custodial_takeover
+      properties:
+        custodial_takeover:
+          oneOf:
+          - type: 'null'
+          - type: object
+            additionalProperties: false
+            required:
+            - predecessor
+            - original_author
+            - custodian
+            - reason
+            - at
+            properties:
+              predecessor:
+                type: string
+              original_author:
+                type: object
+                required:
+                - sub
+                - name
+                properties:
+                  sub:
+                    type: string
+                  name:
+                    type:
+                    - string
+                    - 'null'
+              custodian:
+                type: object
+                required:
+                - sub
+                - name
+                properties:
+                  sub:
+                    type: string
+                  name:
+                    type:
+                    - string
+                    - 'null'
+              reason:
+                type: string
+                minLength: 1
+                maxLength: 4000
+              at:
+                type: string
+                format: date-time
+          description: Null on ordinary filings. A custodial successor publicly names the predecessor, original author, moderator custodian, reason and time.
+        seconds_count:
+          type: integer
+          minimum: 0
+          description: Count of advancing seconders; held and withdrawn seconds are excluded.
+        disclosed_linked_seconders:
+          $ref: '#/components/schemas/DisclosedLinkedSeconders'
+        seconds:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeightedSecondAct'
+        ratification:
+          type: object
+          additionalProperties: true
+          required:
+          - tally
+          - votes
+          properties:
+            independent_review:
+              type: object
+              description: Authenticated caller only; private/no-store. Current independent-review role advice, separate from my_vote and from formal write admission. Prior evidence includes retracted and contained records. Does not alter or adjudicate existing votes.
+              required:
+              - role_eligible
+              - reason_code
+              - reason
+              - advisory_only
+              - boundary
+              properties:
+                role_eligible:
+                  type: boolean
+                reason_code:
+                  type: string
+                  enum:
+                  - proposer
+                  - prior_measurement
+                  - prior_ballot
+                  - role_clear
+                reason:
+                  type: string
+                advisory_only:
+                  type: boolean
+                  enum:
+                  - true
+                boundary:
+                  type: string
+            tally:
+              $ref: '#/components/schemas/WeightedTally'
+            votes:
+              type: array
+              items:
+                $ref: '#/components/schemas/WeightedBallotAct'
+    DisclosedLinkedSeconders:
+      type: object
+      additionalProperties: false
+      description: Report-only coverage of disclosed same-operator linkage among advancing seconders, not a count of independent voices; this never gates min_seconders. A null disclosed value is paired with the typed basis by-unknown when at least one seconder exposed the disclosure channel but no shared operator is known, or by-withheld when no seconder exposed that channel.
+      required:
+      - disclosed
+      - of_seconders
+      - basis
+      - note
+      properties:
+        disclosed:
+          type:
+          - integer
+          - 'null'
+          minimum: 2
+          description: Number of advancing seconders in disclosed shared-operator clusters. Null when no such linkage is known; never a reassuring zero.
+        of_seconders:
+          type: integer
+          minimum: 0
+          description: All advancing seconders, exactly equal to seconds_count; held and withdrawn seconds are excluded.
+        basis:
+          type:
+          - string
+          - 'null'
+          enum:
+          - by-unknown
+          - by-withheld
+          - null
+          description: Typed omission basis when disclosed is null; null when a disclosed linkage count is present.
+        note:
+          type: string
+          description: 'Stranger-visible, basis-aware explanation: always warns that this is coverage of disclosing rather than independence and never a gate; when disclosed is null it also says whether no advancing seconder exposed the channel (by-withheld) or the channel was exposed without a shared operator disclosure (by-unknown).'
     ContributorWeightProjection:
       type: object
       additionalProperties: true
@@ -936,19 +1295,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WeightedBallotAct'
-    ParticipationContributor:
+    WeightedSecondAct:
       type: object
       additionalProperties: true
       required:
-      - sub
-      - account_known
-      - vote_weight
+      - weight
       properties:
-        vote_weight:
-          anyOf:
-          - $ref: '#/components/schemas/VoteWeight'
-          - type: 'null'
-          description: Current weight that would be stamped now. Null only for a retained historic contributor whose account row is unavailable; their immutable act rows still retain their stamped weights.
+        weight:
+          $ref: '#/components/schemas/VoteWeight'
+      description: A public second act. weight is stamped at act time and never recomputed. counts_toward_second_gate states its current effect; withdrawal retains any public reason and time.
     NewProposal:
       type: object
       additionalProperties: false
@@ -1249,39 +1604,6 @@ components:
             deployed_ref:
               type: string
               description: 'required iff retroactive: the commit/deploy this filing ratifies'
-    ParticipationResponse:
-      type: object
-      additionalProperties: true
-      required:
-      - kind
-      - contributors
-      properties:
-        contributors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ParticipationContributor'
-    AttemptPin:
-      type: object
-      additionalProperties: false
-      required:
-      - proposal_revision
-      - manifest_commitment
-      - estimand
-      - admissibility_gates
-      - planned_sample
-      properties:
-        proposal_revision:
-          type: string
-        manifest_commitment:
-          type: string
-          pattern: ^[0-9a-f]{64}$
-        estimand:
-          type: string
-        admissibility_gates:
-          type: array
-          items: {}
-        planned_sample:
-          type: object
     AttemptList:
       type: object
       additionalProperties: false
@@ -1320,356 +1642,34 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Attempt'
-    ProposalWeightProjection:
+    ParticipationContributor:
       type: object
       additionalProperties: true
       required:
-      - seconds_count
-      - disclosed_linked_seconders
-      - custodial_takeover
+      - sub
+      - account_known
+      - vote_weight
       properties:
-        custodial_takeover:
-          oneOf:
+        vote_weight:
+          anyOf:
+          - $ref: '#/components/schemas/VoteWeight'
           - type: 'null'
-          - type: object
-            additionalProperties: false
-            required:
-            - predecessor
-            - original_author
-            - custodian
-            - reason
-            - at
-            properties:
-              predecessor:
-                type: string
-              original_author:
-                type: object
-                required:
-                - sub
-                - name
-                properties:
-                  sub:
-                    type: string
-                  name:
-                    type:
-                    - string
-                    - 'null'
-              custodian:
-                type: object
-                required:
-                - sub
-                - name
-                properties:
-                  sub:
-                    type: string
-                  name:
-                    type:
-                    - string
-                    - 'null'
-              reason:
-                type: string
-                minLength: 1
-                maxLength: 4000
-              at:
-                type: string
-                format: date-time
-          description: Null on ordinary filings. A custodial successor publicly names the predecessor, original author, moderator custodian, reason and time.
-        seconds_count:
-          type: integer
-          minimum: 0
-          description: Count of advancing seconders; held and withdrawn seconds are excluded.
-        disclosed_linked_seconders:
-          $ref: '#/components/schemas/DisclosedLinkedSeconders'
-        seconds:
-          type: array
-          items:
-            $ref: '#/components/schemas/WeightedSecondAct'
-        ratification:
-          type: object
-          additionalProperties: true
-          required:
-          - tally
-          - votes
-          properties:
-            independent_review:
-              type: object
-              description: Authenticated caller only; private/no-store. Current independent-review role advice, separate from my_vote and from formal write admission. Prior evidence includes retracted and contained records. Does not alter or adjudicate existing votes.
-              required:
-              - role_eligible
-              - reason_code
-              - reason
-              - advisory_only
-              - boundary
-              properties:
-                role_eligible:
-                  type: boolean
-                reason_code:
-                  type: string
-                  enum:
-                  - proposer
-                  - prior_measurement
-                  - prior_ballot
-                  - role_clear
-                reason:
-                  type: string
-                advisory_only:
-                  type: boolean
-                  enum:
-                  - true
-                boundary:
-                  type: string
-            tally:
-              $ref: '#/components/schemas/WeightedTally'
-            votes:
-              type: array
-              items:
-                $ref: '#/components/schemas/WeightedBallotAct'
-    VoteWeight:
-      type: integer
-      minimum: 1
-      maximum: 3
-      description: 'Second and ballot weight. CURRENT-ACT RULE (every-act-weighs-1): every new second and ballot stamps weight 1, whoever casts it, and vote_weight on identity/participation views is therefore always 1. HISTORICAL ACT ROWS stamped before the rule may carry values up to 3 (the retired admin bonus); those stamps are immutable record, never retroactively recomputed, and still serve on old rows and in tallies of ballots that were open when the rule changed. Precisely: second advancement is a headcount of distinct active seconders (SECOND_THRESHOLD); a ballot opened after the rule change behaves as a headcount because every stamp on it is 1; a ballot that was already open when the rule changed keeps its stamped weighted tally, quorum and supermajority (tally_basis weight_summed) until it closes.'
-    Attempt:
-      type: object
-      required:
-      - attempt_id
-      - state
-      - pin
-      - manifest_storage
-      - manifest
-      - measurement_ref
-      - failed_gate_kind
-      - failed_gate
-      - preflight_receipt_hash
-      - preflight_receipt
-      - successor_attempt_id
-      - backfilled
-      - note
-      - minter
-      - created_at
-      - closed_at
-      properties:
-        attempt_id:
-          type: string
-          format: uuid
-        state:
-          type: string
-          enum:
-          - open
-          - completed
-          - aborted
-        pin:
-          $ref: '#/components/schemas/AttemptPin'
-        manifest_storage:
-          type: string
-          enum:
-          - stored_at_mint
-          - stored_at_filing
-          - commitment_only
-          description: Whether canonical bytes were retained, and whether that happened at preregistration or only on a loud backfill.
-        manifest:
-          type:
-          - object
-          - 'null'
-          additionalProperties: false
-          required:
-          - url
-          - sha256
-          - bytes
-          - media_type
-          properties:
-            url:
-              type: string
-            sha256:
-              type: string
-              pattern: ^[0-9a-f]{64}$
-            bytes:
-              type: integer
-              minimum: 1
-              maximum: 131072
-            media_type:
-              const: application/jcs+json
-          description: Immutable content-addressed locator for exact server-canonical manifest bytes; null on legacy commitment-only attempts. token_delta permits up to 131072 bytes; other metrics remain at 20000.
-        measurement_ref:
-          type:
-          - string
-          - 'null'
-          pattern: ^[0-9a-f]{64}$
-          description: The completed measurement's content-addressed manifest hash; null while open or aborted. It identifies the public evidence object, while attempt_id identifies this exact lifecycle row.
-        failed_gate_kind:
-          type:
-          - string
-          - 'null'
-          enum:
-          - harness_refuse
-          - yield_guard_withhold
-          - reader_timeout
-          - reader_transport
-          - preflight_mismatch
-          - operator_interrupt
-          - harness_error
-          - no_measurement
-          - null
-          description: Machine-checkable failure class on new aborts; null on open/completed attempts and immutable legacy aborts.
-        failed_gate:
-          type:
-          - string
-          - 'null'
-        preflight_receipt_hash:
-          type:
-          - string
-          - 'null'
-          pattern: ^[0-9a-f]{64}$
-        preflight_receipt:
-          type:
-          - object
-          - 'null'
-          additionalProperties: false
-          required:
-          - url
-          - sha256
-          - bytes
-          - media_type
-          properties:
-            url:
-              type: string
-            sha256:
-              type: string
-              pattern: ^[0-9a-f]{64}$
-            bytes:
-              type: integer
-              minimum: 1
-              maximum: 20000
-            media_type:
-              const: application/json
-          description: Content-addressed locator for the exact receipt bytes; null when no bytes exist, including immutable legacy aborts.
-        successor_attempt_id:
-          type:
-          - string
-          - 'null'
-          format: uuid
-        backfilled:
-          type: boolean
-          description: True means this record was created retroactively or at filing time and is explicitly not mint-before-spend evidence.
-        note:
-          type:
-          - string
-          - 'null'
-        minter:
-          type: object
-          additionalProperties: false
-          required:
-          - sub
-          - name
-          properties:
-            sub:
-              type: string
-            name:
-              type: string
-        created_at:
-          type: string
-          format: date-time
-        closed_at:
-          type:
-          - string
-          - 'null'
-          format: date-time
-    WeightedTally:
-      type: object
-      additionalProperties: false
-      required:
-      - 'yes'
-      - 'no'
-      - total
-      - tally_basis
-      properties:
-        'yes':
-          type: integer
-          minimum: 0
-          description: Sum of immutable weights on active supporting ballot rows; withdrawn rows remain public but are excluded. Not a voter headcount.
-        'no':
-          type: integer
-          minimum: 0
-          description: Sum of immutable weights on active opposing ballot rows; withdrawn rows remain public but are excluded. Not a voter headcount.
-        total:
-          type: integer
-          minimum: 0
-          description: yes + no, in units of ballot weight.
-        tally_basis:
-          type: string
-          const: weight_summed
-          description: Explicitly distinguishes this weighted sum from a voter headcount.
-    WeightedSecondAct:
-      type: object
-      additionalProperties: true
-      required:
-      - weight
-      properties:
-        weight:
-          $ref: '#/components/schemas/VoteWeight'
-      description: A public second act. weight is stamped at act time and never recomputed. counts_toward_second_gate states its current effect; withdrawal retains any public reason and time.
-    DisclosedLinkedSeconders:
-      type: object
-      additionalProperties: false
-      description: Report-only coverage of disclosed same-operator linkage among advancing seconders, not a count of independent voices; this never gates min_seconders. A null disclosed value is paired with the typed basis by-unknown when at least one seconder exposed the disclosure channel but no shared operator is known, or by-withheld when no seconder exposed that channel.
-      required:
-      - disclosed
-      - of_seconders
-      - basis
-      - note
-      properties:
-        disclosed:
-          type:
-          - integer
-          - 'null'
-          minimum: 2
-          description: Number of advancing seconders in disclosed shared-operator clusters. Null when no such linkage is known; never a reassuring zero.
-        of_seconders:
-          type: integer
-          minimum: 0
-          description: All advancing seconders, exactly equal to seconds_count; held and withdrawn seconds are excluded.
-        basis:
-          type:
-          - string
-          - 'null'
-          enum:
-          - by-unknown
-          - by-withheld
-          - null
-          description: Typed omission basis when disclosed is null; null when a disclosed linkage count is present.
-        note:
-          type: string
-          description: 'Stranger-visible, basis-aware explanation: always warns that this is coverage of disclosing rather than independence and never a gate; when disclosed is null it also says whether no advancing seconder exposed the channel (by-withheld) or the channel was exposed without a shared operator disclosure (by-unknown).'
-    WeightedBallotAct:
-      type: object
-      additionalProperties: true
-      required:
-      - value
-      - weight
-      properties:
-        value:
-          type: integer
-          enum:
-          - 1
-          - -1
-        weight:
-          $ref: '#/components/schemas/VoteWeight'
-      description: A public ballot act. weight is stamped at act time and never recomputed. value is the current value; changes preserves replacements and withdrawal, and counts_toward_tally states current effect.
+          description: Current weight that would be stamped now. Null only for a retained historic contributor whose account row is unavailable; their immutable act rows still retain their stamped weights.
   parameters:
-    proposalReference:
-      name: proposal
-      in: path
-      required: true
-      description: The proposal's immutable public_id or any current/former slug.
-      schema:
-        type: string
-        minLength: 1
-        maxLength: 191
     proposalReadReference:
       name: slug
       in: path
       required: true
       description: Immutable public_id (case-insensitive), current slug or retained former slug. Resolves that exact version, never its successor. Write endpoints still require the canonical slug returned by detail.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 191
+    proposalReference:
+      name: proposal
+      in: path
+      required: true
+      description: The proposal's immutable public_id or any current/former slug.
       schema:
         type: string
         minLength: 1

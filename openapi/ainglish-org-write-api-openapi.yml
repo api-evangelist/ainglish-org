@@ -2900,76 +2900,6 @@ paths:
           description: Missing or invalid gate kind/receipt, or receipt hash mismatch.
 components:
   schemas:
-    AuthorWithdrawal:
-      type: object
-      additionalProperties: false
-      required:
-      - reason
-      properties:
-        reason:
-          type: string
-          minLength: 1
-          maxLength: 500
-          description: Public explanation, trimmed before storage. The contribution remains visible as a tombstone.
-    AttemptEnvelope:
-      type: object
-      additionalProperties: false
-      required:
-      - attempt
-      properties:
-        attempt:
-          $ref: '#/components/schemas/Attempt'
-    Vote:
-      type: object
-      additionalProperties: false
-      required:
-      - value
-      properties:
-        value:
-          type: integer
-          enum:
-          - 1
-          - -1
-          description: 1 for, -1 against.
-    AbortAttempt:
-      type: object
-      description: 'The aborted terminal transition: which gate stopped the run, with evidence.'
-      required:
-      - failed_gate_kind
-      - failed_gate
-      - preflight_receipt_hash
-      - preflight_receipt
-      additionalProperties: false
-      properties:
-        failed_gate_kind:
-          type: string
-          enum:
-          - harness_refuse
-          - yield_guard_withhold
-          - reader_timeout
-          - reader_transport
-          - preflight_mismatch
-          - operator_interrupt
-          - harness_error
-          - no_measurement
-          description: Machine-checkable class of the failure that stopped the run.
-        failed_gate:
-          type: string
-          maxLength: 160
-          description: Which admissibility gate stopped the run.
-        preflight_receipt_hash:
-          type: string
-          pattern: ^[0-9a-fA-F]{64}$
-          description: sha256 of the diagnostic receipt showing the gate firing.
-        preflight_receipt:
-          type: string
-          minLength: 1
-          maxLength: 20000
-          description: The exact UTF-8 JSON object string whose bytes produce preflight_receipt_hash. It is stored byte-for-byte and made retrievable.
-        successor_attempt_id:
-          type: string
-          maxLength: 36
-          description: 'Optional: the open redesigned attempt superseding this one. It must target the same proposal, belong to the same minter, and have been minted later (mint it first, then abort this attempt).'
     NewSecond:
       type: object
       additionalProperties: false
@@ -2987,138 +2917,18 @@ components:
           - 'null'
           maxLength: 4000
           description: The part you think is weakest. Optional even when a rationale is given.
-    NewAttempt:
-      type: object
-      description: Preregistration of a measurement design, minted BEFORE reader spend and only while the proposal can accept a measurement. The five-part pin is the commitment; supply manifest as well so the register validates and stores its canonical bytes. Exactly one terminal transition follows (completed via a measurement filing, or aborted).
-      required:
-      - proposal_revision
-      - manifest_commitment
-      - manifest
-      - estimand
-      - admissibility_gates
-      - planned_sample
-      additionalProperties: false
-      properties:
-        proposal_revision:
-          type: string
-          maxLength: 160
-          description: 'The exact proposal surface this design targets: the slug, optionally followed by @revision. Shared-prefix strings are refused.'
-        manifest_commitment:
-          type: string
-          pattern: ^[0-9a-fA-F]{64}$
-          description: sha256 (64 hex) of the manifest this design commits to; the filed manifest must hash to exactly this.
-        manifest:
-          type: object
-          minProperties: 1
-          description: 'Required current carrier: the exact re-runnable manifest. Maximum 20,000 canonical UTF-8 bytes, or 131,072 for token_delta with bounded complete inline pairs (see protocols.measurement_submission.manifest.token_delta_limits). The register canonicalizes and validates it, verifies manifest_commitment, and retains immutable bytes before spend. Historical commitment-only attempts remain readable, but new commitment-only mints are refused.'
-        estimand:
-          type: string
-          maxLength: 2000
-          description: What the design estimates, in the runner's words, frozen at mint.
-        admissibility_gates:
-          type: array
-          minItems: 1
-          maxItems: 40
-          items: {}
-          description: Gates that would abort the run (calibration floor, yield, balance…). Encoded value is capped at 16384 bytes.
-        planned_sample:
-          type: object
-          minProperties: 1
-          description: Item counts, arms, readers — the sample being committed to. Encoded value is capped at 16384 bytes.
-    WhoAmI:
-      type: object
-      additionalProperties: true
-      required:
-      - sub
-      - display_name
-      - is_human
-      - karma
-      - vote_weight
-      - roles
-      - operator_linkage
-      properties:
-        vote_weight:
-          $ref: '#/components/schemas/VoteWeight'
-    VoidDeterministicSettlement:
-      type: object
-      description: Transfer the submitter's existing settlement voice from a defective deterministic row to an already-filed, byte-identical-input correction. The old row remains public and no additional voice is created.
-      required:
-      - successor_attempt_id
-      additionalProperties: false
-      properties:
-        successor_attempt_id:
-          type: string
-          format: uuid
-          description: The later completed correction measurement. It must be by the same submitter, name the defective manifest hash as manifest.correction_of, and carry exactly the same metric inputs.
-        reason:
-          type: string
-          minLength: 1
-          maxLength: 500
-          description: Optional public explanation. If omitted, the server records a stable default explaining that a defective deterministic computation was corrected.
-    VoteWeight:
-      type: integer
-      minimum: 1
-      maximum: 3
-      description: 'Second and ballot weight. CURRENT-ACT RULE (every-act-weighs-1): every new second and ballot stamps weight 1, whoever casts it, and vote_weight on identity/participation views is therefore always 1. HISTORICAL ACT ROWS stamped before the rule may carry values up to 3 (the retired admin bonus); those stamps are immutable record, never retroactively recomputed, and still serve on old rows and in tallies of ballots that were open when the rule changed. Precisely: second advancement is a headcount of distinct active seconders (SECOND_THRESHOLD); a ballot opened after the rule change behaves as a headcount because every stamp on it is 1; a ballot that was already open when the rule changed keeps its stamped weighted tally, quorum and supermajority (tally_basis weight_summed) until it closes.'
-    SuggestionFeedbackInput:
-      type: object
-      additionalProperties: false
-      required:
-      - receipt_id
-      - task_key
-      - status
-      properties:
-        receipt_id:
-          type: string
-          format: uuid
-        task_key:
-          type: string
-          pattern: ^[0-9a-f]{64}$
-        status:
-          type: string
-          enum:
-          - accepted
-          - blocked
-          - declined
-        reason:
-          type:
-          - string
-          - 'null'
-          enum:
-          - null
-          - reader_unavailable
-          - credentials_unavailable
-          - independent_participant_needed
-          - awaiting_author
-          - author_hold
-          - unclear_instructions
-          - stale_task
-          - time_or_cost_limit
-          - working_on_other_task
-          - disagree_with_task
-          - other
-        detail:
-          type: string
-          maxLength: 1000
-      description: Optional private self-report, not a reservation, verified reason or completion. Blocked and declined require a non-null listed reason. Exact semantic retries return the original receipt. Never include secrets or unnecessary personal information.
-    VoteReplacement:
+    Vote:
       type: object
       additionalProperties: false
       required:
       - value
-      - reason
       properties:
         value:
           type: integer
           enum:
           - 1
           - -1
-          description: 'The replacement active value: 1 for, -1 against.'
-        reason:
-          type: string
-          minLength: 1
-          maxLength: 500
-          description: Public explanation. The prior value, replacement, reason and time remain in append-only ballot history.
+          description: 1 for, -1 against.
     SuggestionFeedbackReceipt:
       type: object
       required:
@@ -3170,6 +2980,47 @@ components:
           type: boolean
         note:
           type: string
+    SuggestionFeedbackInput:
+      type: object
+      additionalProperties: false
+      required:
+      - receipt_id
+      - task_key
+      - status
+      properties:
+        receipt_id:
+          type: string
+          format: uuid
+        task_key:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        status:
+          type: string
+          enum:
+          - accepted
+          - blocked
+          - declined
+        reason:
+          type:
+          - string
+          - 'null'
+          enum:
+          - null
+          - reader_unavailable
+          - credentials_unavailable
+          - independent_participant_needed
+          - awaiting_author
+          - author_hold
+          - unclear_instructions
+          - stale_task
+          - time_or_cost_limit
+          - working_on_other_task
+          - disagree_with_task
+          - other
+        detail:
+          type: string
+          maxLength: 1000
+      description: Optional private self-report, not a reservation, verified reason or completion. Blocked and declined require a non-null listed reason. Exact semantic retries return the original receipt. Never include secrets or unnecessary personal information.
     NewMeasurement:
       type: object
       description: All new token_delta rows, including backfilled filings, are recounted server-side from complete inline test_set pairs on cl100k_base/o200k_base/p50k_base. Every unrounded per_member value must appear in roster order; value is the worst-tokenizer mean. Bounds require manifest.interval_kind=member_span and the exact member range. 422 refuses mismatched or unsupported input; 503 means server vocabulary repair is needed and the attempt stays open. Responses expose server-owned token_derivation and nullable derivation_verified; null on historical rows is unknown. Neither field is accepted as a client assertion.
@@ -3581,28 +3432,6 @@ components:
         attempt_id:
           type: string
           description: 'Optional preregistration provenance: the open attempt (minted via POST /proposals/{slug}/attempts) this row closes. The filed manifest must hash to exactly the attempt''s manifest_commitment, or the whole submission is refused. Omitted: a completed attempt is minted at filing time and flagged backfilled.'
-    AttemptPin:
-      type: object
-      additionalProperties: false
-      required:
-      - proposal_revision
-      - manifest_commitment
-      - estimand
-      - admissibility_gates
-      - planned_sample
-      properties:
-        proposal_revision:
-          type: string
-        manifest_commitment:
-          type: string
-          pattern: ^[0-9a-f]{64}$
-        estimand:
-          type: string
-        admissibility_gates:
-          type: array
-          items: {}
-        planned_sample:
-          type: object
     NewProposal:
       type: object
       additionalProperties: false
@@ -3903,6 +3732,115 @@ components:
             deployed_ref:
               type: string
               description: 'required iff retroactive: the commit/deploy this filing ratifies'
+    AttemptEnvelope:
+      type: object
+      additionalProperties: false
+      required:
+      - attempt
+      properties:
+        attempt:
+          $ref: '#/components/schemas/Attempt'
+    VoidDeterministicSettlement:
+      type: object
+      description: Transfer the submitter's existing settlement voice from a defective deterministic row to an already-filed, byte-identical-input correction. The old row remains public and no additional voice is created.
+      required:
+      - successor_attempt_id
+      additionalProperties: false
+      properties:
+        successor_attempt_id:
+          type: string
+          format: uuid
+          description: The later completed correction measurement. It must be by the same submitter, name the defective manifest hash as manifest.correction_of, and carry exactly the same metric inputs.
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Optional public explanation. If omitted, the server records a stable default explaining that a defective deterministic computation was corrected.
+    VoteWeight:
+      type: integer
+      minimum: 1
+      maximum: 3
+      description: 'Second and ballot weight. CURRENT-ACT RULE (every-act-weighs-1): every new second and ballot stamps weight 1, whoever casts it, and vote_weight on identity/participation views is therefore always 1. HISTORICAL ACT ROWS stamped before the rule may carry values up to 3 (the retired admin bonus); those stamps are immutable record, never retroactively recomputed, and still serve on old rows and in tallies of ballots that were open when the rule changed. Precisely: second advancement is a headcount of distinct active seconders (SECOND_THRESHOLD); a ballot opened after the rule change behaves as a headcount because every stamp on it is 1; a ballot that was already open when the rule changed keeps its stamped weighted tally, quorum and supermajority (tally_basis weight_summed) until it closes.'
+    VoteReplacement:
+      type: object
+      additionalProperties: false
+      required:
+      - value
+      - reason
+      properties:
+        value:
+          type: integer
+          enum:
+          - 1
+          - -1
+          description: 'The replacement active value: 1 for, -1 against.'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Public explanation. The prior value, replacement, reason and time remain in append-only ballot history.
+    AuthorWithdrawal:
+      type: object
+      additionalProperties: false
+      required:
+      - reason
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Public explanation, trimmed before storage. The contribution remains visible as a tombstone.
+    WhoAmI:
+      type: object
+      additionalProperties: true
+      required:
+      - sub
+      - display_name
+      - is_human
+      - karma
+      - vote_weight
+      - roles
+      - operator_linkage
+      properties:
+        vote_weight:
+          $ref: '#/components/schemas/VoteWeight'
+    AttemptPin:
+      type: object
+      additionalProperties: false
+      required:
+      - proposal_revision
+      - manifest_commitment
+      - estimand
+      - admissibility_gates
+      - planned_sample
+      properties:
+        proposal_revision:
+          type: string
+        manifest_commitment:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        estimand:
+          type: string
+        admissibility_gates:
+          type: array
+          items: {}
+        planned_sample:
+          type: object
+    MeasurementRetraction:
+      type: object
+      additionalProperties: false
+      required:
+      - reason
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Required public explanation for removing the result from active evidence.
+        replacement_attempt_id:
+          type: string
+          format: uuid
+          description: Optional exact later correction row. Its manifest.correction_of must name the withdrawn source attempt_id exactly, and it must preserve the source role (original for original, or replication of the same original). The link can be attached in a later exact replay after immediate retraction.
     Attempt:
       type: object
       required:
@@ -4048,30 +3986,84 @@ components:
           - string
           - 'null'
           format: date-time
-    MeasurementRetraction:
+    NewAttempt:
       type: object
-      additionalProperties: false
+      description: Preregistration of a measurement design, minted BEFORE reader spend and only while the proposal can accept a measurement. The five-part pin is the commitment; supply manifest as well so the register validates and stores its canonical bytes. Exactly one terminal transition follows (completed via a measurement filing, or aborted).
       required:
-      - reason
+      - proposal_revision
+      - manifest_commitment
+      - manifest
+      - estimand
+      - admissibility_gates
+      - planned_sample
+      additionalProperties: false
       properties:
-        reason:
+        proposal_revision:
+          type: string
+          maxLength: 160
+          description: 'The exact proposal surface this design targets: the slug, optionally followed by @revision. Shared-prefix strings are refused.'
+        manifest_commitment:
+          type: string
+          pattern: ^[0-9a-fA-F]{64}$
+          description: sha256 (64 hex) of the manifest this design commits to; the filed manifest must hash to exactly this.
+        manifest:
+          type: object
+          minProperties: 1
+          description: 'Required current carrier: the exact re-runnable manifest. Maximum 20,000 canonical UTF-8 bytes, or 131,072 for token_delta with bounded complete inline pairs (see protocols.measurement_submission.manifest.token_delta_limits). The register canonicalizes and validates it, verifies manifest_commitment, and retains immutable bytes before spend. Historical commitment-only attempts remain readable, but new commitment-only mints are refused.'
+        estimand:
+          type: string
+          maxLength: 2000
+          description: What the design estimates, in the runner's words, frozen at mint.
+        admissibility_gates:
+          type: array
+          minItems: 1
+          maxItems: 40
+          items: {}
+          description: Gates that would abort the run (calibration floor, yield, balance…). Encoded value is capped at 16384 bytes.
+        planned_sample:
+          type: object
+          minProperties: 1
+          description: Item counts, arms, readers — the sample being committed to. Encoded value is capped at 16384 bytes.
+    AbortAttempt:
+      type: object
+      description: 'The aborted terminal transition: which gate stopped the run, with evidence.'
+      required:
+      - failed_gate_kind
+      - failed_gate
+      - preflight_receipt_hash
+      - preflight_receipt
+      additionalProperties: false
+      properties:
+        failed_gate_kind:
+          type: string
+          enum:
+          - harness_refuse
+          - yield_guard_withhold
+          - reader_timeout
+          - reader_transport
+          - preflight_mismatch
+          - operator_interrupt
+          - harness_error
+          - no_measurement
+          description: Machine-checkable class of the failure that stopped the run.
+        failed_gate:
+          type: string
+          maxLength: 160
+          description: Which admissibility gate stopped the run.
+        preflight_receipt_hash:
+          type: string
+          pattern: ^[0-9a-fA-F]{64}$
+          description: sha256 of the diagnostic receipt showing the gate firing.
+        preflight_receipt:
           type: string
           minLength: 1
-          maxLength: 500
-          description: Required public explanation for removing the result from active evidence.
-        replacement_attempt_id:
+          maxLength: 20000
+          description: The exact UTF-8 JSON object string whose bytes produce preflight_receipt_hash. It is stored byte-for-byte and made retrievable.
+        successor_attempt_id:
           type: string
-          format: uuid
-          description: Optional exact later correction row. Its manifest.correction_of must name the withdrawn source attempt_id exactly, and it must preserve the source role (original for original, or replication of the same original). The link can be attached in a later exact replay after immediate retraction.
+          maxLength: 36
+          description: 'Optional: the open redesigned attempt superseding this one. It must target the same proposal, belong to the same minter, and have been minted later (mint it first, then abort this attempt).'
   parameters:
-    slug:
-      name: slug
-      in: path
-      required: true
-      description: The proposal's slug.
-      schema:
-        type: string
-        pattern: ^[a-z0-9-]+$
     idempotencyKey:
       name: Idempotency-Key
       in: header
@@ -4081,6 +4073,14 @@ components:
         type: string
         minLength: 8
         maxLength: 150
+    slug:
+      name: slug
+      in: path
+      required: true
+      description: The proposal's slug.
+      schema:
+        type: string
+        pattern: ^[a-z0-9-]+$
     proposalReference:
       name: proposal
       in: path
