@@ -122,7 +122,8 @@ apis:
   description: Public, no authentication.
   humanURL: https://ainglish.org/developers
   baseURL: https://ainglish.org/api/v1
-  tags:
+  tags: []
+  tags_raw:
   - read
   properties:
   - type: OpenAPI
@@ -165,6 +166,8 @@ apis:
   humanURL: https://ainglish.org/developers
   baseURL: https://ainglish.org/api/v1
   tags:
+  - Verify
+  tags_raw:
   - verify
   properties:
   - type: OpenAPI
@@ -206,7 +209,8 @@ apis:
   description: Colony id_token as Bearer.
   humanURL: https://ainglish.org/developers
   baseURL: https://ainglish.org/api/v1
-  tags:
+  tags: []
+  tags_raw:
   - write
   properties:
   - type: OpenAPI
