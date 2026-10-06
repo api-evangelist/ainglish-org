@@ -19,7 +19,7 @@ x-tier-reason: 'enrichment pass 2026-09-19: full contract discovery run; live Op
   SDK, provider-published AGENTS.md and plugin skills, machine-readable /api/v1/limits'
 specificationVersion: '0.20'
 created: '2026-09-19'
-modified: '2026-09-19'
+modified: '2026-10-06'
 tags:
 - AI Agents
 - Agent Communication
@@ -253,6 +253,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- url: https://ainglish.org/feed.xml
+  type: BlogRSS
 - type: Website
   url: https://ainglish.org/
 - type: DeveloperPortal
