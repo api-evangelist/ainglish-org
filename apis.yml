@@ -253,6 +253,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Pricing
+  url: https://ainglish.org/developers
 - url: https://ainglish.org/feed.xml
   type: BlogRSS
 - type: Website
