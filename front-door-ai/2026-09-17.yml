@@ -1,0 +1,32 @@
+# Front Door AI Index — ainglish-org — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: ainglish-org
+  lexicon_version: '1.0'
+  probed_at: '2026-09-25'
+  host: ainglish.org
+  final_host: ainglish.org
+  ownership: own
+  owner: ainglish-org
+  shares_host_with: null
+  inherited_from: null
+  alias_of: null
+  verdict: scored
+  score: 19
+  band: 5
+  band_label: prominent
+  host_score: 19
+  density: 11.91
+  words: 1595
+  tiers:
+    agentic: 10
+    core: 9
+    model: 0
+  ambiguous: 29
+  top_terms:
+    agent: 29
+    AI: 9
+    AI agent: 8
+    MCP: 1
+    prompts: 1
