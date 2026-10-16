@@ -1,0 +1,14 @@
+{
+  "repo": "ainglish-org",
+  "feeds": [
+    {
+      "source": "https://ainglish.org/feed.xml",
+      "feed_url": "https://ainglish.org/feed.xml",
+      "title": "",
+      "saved": 50,
+      "method": "feed"
+    }
+  ],
+  "post_count": 50,
+  "fetched": "2026-10-10T13:15:00Z"
+}
