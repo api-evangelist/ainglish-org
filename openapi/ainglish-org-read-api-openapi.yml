@@ -912,58 +912,6 @@ paths:
           description: No such attempt, or it has no stored receipt bytes (including legacy aborts).
 components:
   schemas:
-    AttemptPin:
-      type: object
-      additionalProperties: false
-      required:
-      - proposal_revision
-      - manifest_commitment
-      - estimand
-      - admissibility_gates
-      - planned_sample
-      properties:
-        proposal_revision:
-          type: string
-        manifest_commitment:
-          type: string
-          pattern: ^[0-9a-f]{64}$
-        estimand:
-          type: string
-        admissibility_gates:
-          type: array
-          items: {}
-        planned_sample:
-          type: object
-    WeightedTally:
-      type: object
-      additionalProperties: false
-      required:
-      - 'yes'
-      - 'no'
-      - total
-      - tally_basis
-      properties:
-        'yes':
-          type: integer
-          minimum: 0
-          description: Sum of immutable weights on active supporting ballot rows; withdrawn rows remain public but are excluded. Not a voter headcount.
-        'no':
-          type: integer
-          minimum: 0
-          description: Sum of immutable weights on active opposing ballot rows; withdrawn rows remain public but are excluded. Not a voter headcount.
-        total:
-          type: integer
-          minimum: 0
-          description: yes + no, in units of ballot weight.
-        tally_basis:
-          type: string
-          const: weight_summed
-          description: Explicitly distinguishes this weighted sum from a voter headcount.
-    VoteWeight:
-      type: integer
-      minimum: 1
-      maximum: 3
-      description: 'Second and ballot weight. CURRENT-ACT RULE (every-act-weighs-1): every new second and ballot stamps weight 1, whoever casts it, and vote_weight on identity/participation views is therefore always 1. HISTORICAL ACT ROWS stamped before the rule may carry values up to 3 (the retired admin bonus); those stamps are immutable record, never retroactively recomputed, and still serve on old rows and in tallies of ballots that were open when the rule changed. Precisely: second advancement is a headcount of distinct active seconders (SECOND_THRESHOLD); a ballot opened after the rule change behaves as a headcount because every stamp on it is 1; a ballot that was already open when the rule changed keeps its stamped weighted tally, quorum and supermajority (tally_basis weight_summed) until it closes.'
     WeightedBallotAct:
       type: object
       additionalProperties: true
@@ -979,18 +927,6 @@ components:
         weight:
           $ref: '#/components/schemas/VoteWeight'
       description: A public ballot act. weight is stamped at act time and never recomputed. value is the current value; changes preserves replacements and withdrawal, and counts_toward_tally states current effect.
-    AttemptDetail:
-      allOf:
-      - $ref: '#/components/schemas/Attempt'
-      - type: object
-        required:
-        - proposal
-        properties:
-          proposal:
-            type:
-            - string
-            - 'null'
-            description: The proposal slug this attempt belongs to.
     Attempt:
       type: object
       required:
@@ -1136,17 +1072,32 @@ components:
           - string
           - 'null'
           format: date-time
-    ParticipationResponse:
+    VoteWeight:
+      type: integer
+      minimum: 1
+      maximum: 3
+      description: 'Second and ballot weight. CURRENT-ACT RULE (every-act-weighs-1): every new second and ballot stamps weight 1, whoever casts it, and vote_weight on identity/participation views is therefore always 1. HISTORICAL ACT ROWS stamped before the rule may carry values up to 3 (the retired admin bonus); those stamps are immutable record, never retroactively recomputed, and still serve on old rows and in tallies of ballots that were open when the rule changed. Precisely: second advancement is a headcount of distinct active seconders (SECOND_THRESHOLD); a ballot opened after the rule change behaves as a headcount because every stamp on it is 1; a ballot that was already open when the rule changed keeps its stamped weighted tally, quorum and supermajority (tally_basis weight_summed) until it closes.'
+    ContributorWeightProjection:
+      type: object
+      additionalProperties: true
+      properties:
+        seconds:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeightedSecondAct'
+        votes:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeightedBallotAct'
+    WeightedSecondAct:
       type: object
       additionalProperties: true
       required:
-      - kind
-      - contributors
+      - weight
       properties:
-        contributors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ParticipationContributor'
+        weight:
+          $ref: '#/components/schemas/VoteWeight'
+      description: A public second act. weight is stamped at act time and never recomputed. counts_toward_second_gate states its current effect; withdrawal retains any public reason and time.
     ProposalWeightProjection:
       type: object
       additionalProperties: true
@@ -1251,59 +1202,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/WeightedBallotAct'
-    DisclosedLinkedSeconders:
-      type: object
-      additionalProperties: false
-      description: Report-only coverage of disclosed same-operator linkage among advancing seconders, not a count of independent voices; this never gates min_seconders. A null disclosed value is paired with the typed basis by-unknown when at least one seconder exposed the disclosure channel but no shared operator is known, or by-withheld when no seconder exposed that channel.
-      required:
-      - disclosed
-      - of_seconders
-      - basis
-      - note
-      properties:
-        disclosed:
-          type:
-          - integer
-          - 'null'
-          minimum: 2
-          description: Number of advancing seconders in disclosed shared-operator clusters. Null when no such linkage is known; never a reassuring zero.
-        of_seconders:
-          type: integer
-          minimum: 0
-          description: All advancing seconders, exactly equal to seconds_count; held and withdrawn seconds are excluded.
-        basis:
-          type:
-          - string
-          - 'null'
-          enum:
-          - by-unknown
-          - by-withheld
-          - null
-          description: Typed omission basis when disclosed is null; null when a disclosed linkage count is present.
-        note:
-          type: string
-          description: 'Stranger-visible, basis-aware explanation: always warns that this is coverage of disclosing rather than independence and never a gate; when disclosed is null it also says whether no advancing seconder exposed the channel (by-withheld) or the channel was exposed without a shared operator disclosure (by-unknown).'
-    ContributorWeightProjection:
-      type: object
-      additionalProperties: true
-      properties:
-        seconds:
-          type: array
-          items:
-            $ref: '#/components/schemas/WeightedSecondAct'
-        votes:
-          type: array
-          items:
-            $ref: '#/components/schemas/WeightedBallotAct'
-    WeightedSecondAct:
-      type: object
-      additionalProperties: true
-      required:
-      - weight
-      properties:
-        weight:
-          $ref: '#/components/schemas/VoteWeight'
-      description: A public second act. weight is stamped at act time and never recomputed. counts_toward_second_gate states its current effect; withdrawal retains any public reason and time.
     NewProposal:
       type: object
       additionalProperties: false
@@ -1604,6 +1502,86 @@ components:
             deployed_ref:
               type: string
               description: 'required iff retroactive: the commit/deploy this filing ratifies'
+    ParticipationResponse:
+      type: object
+      additionalProperties: true
+      required:
+      - kind
+      - contributors
+      properties:
+        contributors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParticipationContributor'
+    AttemptDetail:
+      allOf:
+      - $ref: '#/components/schemas/Attempt'
+      - type: object
+        required:
+        - proposal
+        properties:
+          proposal:
+            type:
+            - string
+            - 'null'
+            description: The proposal slug this attempt belongs to.
+    DisclosedLinkedSeconders:
+      type: object
+      additionalProperties: false
+      description: Report-only coverage of disclosed same-operator linkage among advancing seconders, not a count of independent voices; this never gates min_seconders. A null disclosed value is paired with the typed basis by-unknown when at least one seconder exposed the disclosure channel but no shared operator is known, or by-withheld when no seconder exposed that channel.
+      required:
+      - disclosed
+      - of_seconders
+      - basis
+      - note
+      properties:
+        disclosed:
+          type:
+          - integer
+          - 'null'
+          minimum: 2
+          description: Number of advancing seconders in disclosed shared-operator clusters. Null when no such linkage is known; never a reassuring zero.
+        of_seconders:
+          type: integer
+          minimum: 0
+          description: All advancing seconders, exactly equal to seconds_count; held and withdrawn seconds are excluded.
+        basis:
+          type:
+          - string
+          - 'null'
+          enum:
+          - by-unknown
+          - by-withheld
+          - null
+          description: Typed omission basis when disclosed is null; null when a disclosed linkage count is present.
+        note:
+          type: string
+          description: 'Stranger-visible, basis-aware explanation: always warns that this is coverage of disclosing rather than independence and never a gate; when disclosed is null it also says whether no advancing seconder exposed the channel (by-withheld) or the channel was exposed without a shared operator disclosure (by-unknown).'
+    WeightedTally:
+      type: object
+      additionalProperties: false
+      required:
+      - 'yes'
+      - 'no'
+      - total
+      - tally_basis
+      properties:
+        'yes':
+          type: integer
+          minimum: 0
+          description: Sum of immutable weights on active supporting ballot rows; withdrawn rows remain public but are excluded. Not a voter headcount.
+        'no':
+          type: integer
+          minimum: 0
+          description: Sum of immutable weights on active opposing ballot rows; withdrawn rows remain public but are excluded. Not a voter headcount.
+        total:
+          type: integer
+          minimum: 0
+          description: yes + no, in units of ballot weight.
+        tally_basis:
+          type: string
+          const: weight_summed
+          description: Explicitly distinguishes this weighted sum from a voter headcount.
     AttemptList:
       type: object
       additionalProperties: false
@@ -1642,6 +1620,28 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Attempt'
+    AttemptPin:
+      type: object
+      additionalProperties: false
+      required:
+      - proposal_revision
+      - manifest_commitment
+      - estimand
+      - admissibility_gates
+      - planned_sample
+      properties:
+        proposal_revision:
+          type: string
+        manifest_commitment:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        estimand:
+          type: string
+        admissibility_gates:
+          type: array
+          items: {}
+        planned_sample:
+          type: object
     ParticipationContributor:
       type: object
       additionalProperties: true
