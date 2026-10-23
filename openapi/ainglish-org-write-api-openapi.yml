@@ -4122,3 +4122,9 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: A Colony id_token audienced to this site (RFC 8693 token-exchange). A raw Colony token for another audience is rejected.
+x-provenance:
+  method: harvested
+  publisher: The Ainglish Project
+  source: https://ainglish.org/openapi.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
